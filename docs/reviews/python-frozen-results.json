@@ -1,0 +1,2410 @@
+[
+  {
+    "mode": "default",
+    "manual_sites": 39,
+    "closed_sites": 37,
+    "tp": 37,
+    "fp": 0,
+    "fn": 1,
+    "precision": 1.0,
+    "recall": 0.9736842105263158,
+    "forbidden": 0,
+    "missing_call_positions": 0,
+    "definite_claims": 0,
+    "rows": [
+      {
+        "case": "direct",
+        "mode": "default",
+        "line": 13,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:direct",
+        "actual_owner": "sample:direct",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "alias",
+        "mode": "default",
+        "line": 17,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:alias",
+        "actual_owner": "sample:alias",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "string",
+        "mode": "default",
+        "line": 21,
+        "expected": [],
+        "actual": [],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:string_value",
+        "actual_owner": "sample:string_value",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "callback_known",
+        "mode": "default",
+        "line": 24,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:invoke",
+        "actual_owner": "sample:invoke",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive",
+          "unknown_value_origin"
+        ],
+        "phase": "function_body",
+        "unknown_sources": true,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "known_driver",
+        "mode": "default",
+        "line": 27,
+        "expected": [
+          "sample:invoke"
+        ],
+        "actual": [
+          "sample:invoke"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:known_driver",
+        "actual_owner": "sample:known_driver",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "callback_mixed",
+        "mode": "default",
+        "line": 30,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:mixed",
+        "actual_owner": "sample:mixed",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive",
+          "unknown_value_origin"
+        ],
+        "phase": "function_body",
+        "unknown_sources": true,
+        "exhaustive": false,
+        "complete_truth": false
+      },
+      {
+        "case": "mixed_known_driver",
+        "mode": "default",
+        "line": 33,
+        "expected": [
+          "sample:mixed"
+        ],
+        "actual": [
+          "sample:mixed"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:mixed_driver",
+        "actual_owner": "sample:mixed_driver",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "mixed_unknown_driver",
+        "mode": "default",
+        "line": 34,
+        "expected": [
+          "sample:mixed"
+        ],
+        "actual": [
+          "sample:mixed"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:mixed_driver",
+        "actual_owner": "sample:mixed_driver",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "dict_fixed",
+        "mode": "default",
+        "line": 38,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:dispatch_fixed",
+        "actual_owner": "sample:dispatch_fixed",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "dict_dynamic",
+        "mode": "default",
+        "line": 42,
+        "expected": [
+          "sample:other",
+          "sample:target"
+        ],
+        "actual": [
+          "sample:other",
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:dispatch_dynamic",
+        "actual_owner": "sample:dispatch_dynamic",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "register",
+        "mode": "default",
+        "line": 44,
+        "expected": [
+          "registry:register"
+        ],
+        "actual": [
+          "registry:register"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:<module>",
+        "actual_owner": "sample:<module>",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "module",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "registry",
+        "mode": "default",
+        "line": 47,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:registered",
+        "actual_owner": "sample:registered",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive",
+          "unknown_value_origin"
+        ],
+        "phase": "function_body",
+        "unknown_sources": true,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "import_alias",
+        "mode": "default",
+        "line": 50,
+        "expected": [
+          "helpers:work"
+        ],
+        "actual": [
+          "helpers:work"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:imported",
+        "actual_owner": "sample:imported",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "shadow",
+        "mode": "default",
+        "line": 53,
+        "expected": [],
+        "actual": [],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:shadow",
+        "actual_owner": "sample:shadow",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive",
+          "unknown_value_origin"
+        ],
+        "phase": "function_body",
+        "unknown_sources": true,
+        "exhaustive": false,
+        "complete_truth": false
+      },
+      {
+        "case": "bare",
+        "mode": "default",
+        "line": 60,
+        "expected": [],
+        "actual": [],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:A.bare",
+        "actual_owner": "sample:A.bare",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive",
+          "unknown_value_origin"
+        ],
+        "phase": "function_body",
+        "unknown_sources": true,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "staticmethod_callback",
+        "mode": "default",
+        "line": 64,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:A.invoke",
+        "actual_owner": "sample:A.invoke",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive",
+          "unknown_value_origin"
+        ],
+        "phase": "function_body",
+        "unknown_sources": true,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "classmethod_body",
+        "mode": "default",
+        "line": 68,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:A.construct",
+        "actual_owner": "sample:A.construct",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "instance",
+        "mode": "default",
+        "line": 72,
+        "expected": [
+          "sample:A.work"
+        ],
+        "actual": [
+          "sample:A.work"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:method_driver",
+        "actual_owner": "sample:method_driver",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "class_attribute",
+        "mode": "default",
+        "line": 73,
+        "expected": [
+          "sample:A.work"
+        ],
+        "actual": [
+          "sample:A.work"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:method_driver",
+        "actual_owner": "sample:method_driver",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "staticmethod_driver",
+        "mode": "default",
+        "line": 74,
+        "expected": [
+          "sample:A.invoke"
+        ],
+        "actual": [
+          "sample:A.invoke"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:method_driver",
+        "actual_owner": "sample:method_driver",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "classmethod_driver",
+        "mode": "default",
+        "line": 75,
+        "expected": [
+          "sample:A.construct"
+        ],
+        "actual": [
+          "sample:A.construct"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:method_driver",
+        "actual_owner": "sample:method_driver",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "super",
+        "mode": "default",
+        "line": 83,
+        "expected": [
+          "sample:Base.run"
+        ],
+        "actual": [
+          "sample:Base.run"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:Child.run",
+        "actual_owner": "sample:Child.run",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "inherited",
+        "mode": "default",
+        "line": 86,
+        "expected": [
+          "sample:Child.run"
+        ],
+        "actual": [
+          "sample:Child.run"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:inherited",
+        "actual_owner": "sample:inherited",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "closure_body",
+        "mode": "default",
+        "line": 90,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:outer.inner",
+        "actual_owner": "sample:outer.inner",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "nested",
+        "mode": "default",
+        "line": 91,
+        "expected": [
+          "sample:outer.inner"
+        ],
+        "actual": [
+          "sample:outer.inner"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:outer",
+        "actual_owner": "sample:outer",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "factory",
+        "mode": "default",
+        "line": 97,
+        "expected": [
+          "sample:factory"
+        ],
+        "actual": [
+          "sample:factory"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:returned",
+        "actual_owner": "sample:returned",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "returned",
+        "mode": "default",
+        "line": 98,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:returned",
+        "actual_owner": "sample:returned",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "lambda_body",
+        "mode": "default",
+        "line": 101,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:lambda_factory.<lambda>",
+        "actual_owner": "sample:lambda_factory.<lambda>",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "lambda_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "lambda_factory",
+        "mode": "default",
+        "line": 104,
+        "expected": [
+          "sample:lambda_factory"
+        ],
+        "actual": [
+          "sample:lambda_factory"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:lambda_driver",
+        "actual_owner": "sample:lambda_driver",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "lambda_call",
+        "mode": "default",
+        "line": 105,
+        "expected": [
+          "sample:lambda_factory.<lambda>"
+        ],
+        "actual": [
+          "sample:lambda_factory.<lambda>"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:lambda_driver",
+        "actual_owner": "sample:lambda_driver",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "decorator_implicit",
+        "mode": "default",
+        "line": 113,
+        "expected": [
+          "sample:decorate"
+        ],
+        "actual": [
+          "sample:decorate"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:<module>",
+        "actual_owner": "sample:<module>",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "definition",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "default",
+        "mode": "default",
+        "line": 114,
+        "expected": [
+          "sample:make"
+        ],
+        "actual": [
+          "sample:make"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:<module>",
+        "actual_owner": "sample:<module>",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "definition",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "decorated_body",
+        "mode": "default",
+        "line": 115,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:decorated",
+        "actual_owner": "sample:decorated",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "branch",
+        "mode": "default",
+        "line": 122,
+        "expected": [
+          "sample:other",
+          "sample:target"
+        ],
+        "actual": [
+          "sample:other",
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:branch",
+        "actual_owner": "sample:branch",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "reassignment",
+        "mode": "default",
+        "line": 127,
+        "expected": [
+          "sample:other"
+        ],
+        "actual": [
+          "sample:other"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:reassignment",
+        "actual_owner": "sample:reassignment",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "external",
+        "mode": "default",
+        "line": 130,
+        "expected": [
+          "json:loads"
+        ],
+        "actual": [],
+        "missing": [
+          "json:loads"
+        ],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:boundary",
+        "actual_owner": "sample:boundary",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive",
+          "external_or_excluded_definition",
+          "unknown_value_origin"
+        ],
+        "phase": "function_body",
+        "unknown_sources": true,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "assignment",
+        "mode": "default",
+        "line": 133,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:references",
+        "actual_owner": null,
+        "raw": [],
+        "reasons": [],
+        "phase": null,
+        "unknown_sources": null,
+        "exhaustive": null,
+        "complete_truth": true
+      },
+      {
+        "case": "container",
+        "mode": "default",
+        "line": 134,
+        "expected": [
+          "sample:other",
+          "sample:target"
+        ],
+        "actual": [
+          "sample:other",
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:references",
+        "actual_owner": null,
+        "raw": [],
+        "reasons": [],
+        "phase": null,
+        "unknown_sources": null,
+        "exhaustive": null,
+        "complete_truth": true
+      },
+      {
+        "case": "factory_return",
+        "mode": "default",
+        "line": 94,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:factory",
+        "actual_owner": null,
+        "raw": [],
+        "reasons": [],
+        "phase": null,
+        "unknown_sources": null,
+        "exhaustive": null,
+        "complete_truth": true
+      }
+    ]
+  },
+  {
+    "mode": "jedi",
+    "manual_sites": 39,
+    "closed_sites": 37,
+    "tp": 37,
+    "fp": 0,
+    "fn": 1,
+    "precision": 1.0,
+    "recall": 0.9736842105263158,
+    "forbidden": 0,
+    "missing_call_positions": 0,
+    "definite_claims": 0,
+    "rows": [
+      {
+        "case": "direct",
+        "mode": "jedi",
+        "line": 13,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:direct",
+        "actual_owner": "sample:direct",
+        "raw": [
+          {
+            "name": "target",
+            "full_name": "sample.target",
+            "type": "function",
+            "line": 6,
+            "column": 4,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def target",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "alias",
+        "mode": "jedi",
+        "line": 17,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:alias",
+        "actual_owner": "sample:alias",
+        "raw": [
+          {
+            "name": "target",
+            "full_name": "sample.target",
+            "type": "function",
+            "line": 6,
+            "column": 4,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def target",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "string",
+        "mode": "jedi",
+        "line": 21,
+        "expected": [],
+        "actual": [],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:string_value",
+        "actual_owner": "sample:string_value",
+        "raw": [
+          {
+            "name": "str",
+            "full_name": "builtins.str",
+            "type": "instance",
+            "line": 480,
+            "column": 6,
+            "module_path": "external://builtins/builtins.pyi",
+            "description": "instance str",
+            "path_mapping": "external physical prefix omitted; not a captured definition",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive",
+          "external_or_excluded_definition",
+          "no_accepted_definition_candidate"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "callback_known",
+        "mode": "jedi",
+        "line": 24,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:invoke",
+        "actual_owner": "sample:invoke",
+        "raw": [
+          {
+            "name": "target",
+            "full_name": "sample.target",
+            "type": "function",
+            "line": 6,
+            "column": 4,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def target",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive",
+          "unknown_value_origin"
+        ],
+        "phase": "function_body",
+        "unknown_sources": true,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "known_driver",
+        "mode": "jedi",
+        "line": 27,
+        "expected": [
+          "sample:invoke"
+        ],
+        "actual": [
+          "sample:invoke"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:known_driver",
+        "actual_owner": "sample:known_driver",
+        "raw": [
+          {
+            "name": "invoke",
+            "full_name": "sample.invoke",
+            "type": "function",
+            "line": 23,
+            "column": 4,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def invoke",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "callback_mixed",
+        "mode": "jedi",
+        "line": 30,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:mixed",
+        "actual_owner": "sample:mixed",
+        "raw": [
+          {
+            "name": "target",
+            "full_name": "sample.target",
+            "type": "function",
+            "line": 6,
+            "column": 4,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def target",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive",
+          "unknown_value_origin"
+        ],
+        "phase": "function_body",
+        "unknown_sources": true,
+        "exhaustive": false,
+        "complete_truth": false
+      },
+      {
+        "case": "mixed_known_driver",
+        "mode": "jedi",
+        "line": 33,
+        "expected": [
+          "sample:mixed"
+        ],
+        "actual": [
+          "sample:mixed"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:mixed_driver",
+        "actual_owner": "sample:mixed_driver",
+        "raw": [
+          {
+            "name": "mixed",
+            "full_name": "sample.mixed",
+            "type": "function",
+            "line": 29,
+            "column": 4,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def mixed",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "mixed_unknown_driver",
+        "mode": "jedi",
+        "line": 34,
+        "expected": [
+          "sample:mixed"
+        ],
+        "actual": [
+          "sample:mixed"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:mixed_driver",
+        "actual_owner": "sample:mixed_driver",
+        "raw": [
+          {
+            "name": "mixed",
+            "full_name": "sample.mixed",
+            "type": "function",
+            "line": 29,
+            "column": 4,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def mixed",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "dict_fixed",
+        "mode": "jedi",
+        "line": 38,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:dispatch_fixed",
+        "actual_owner": "sample:dispatch_fixed",
+        "raw": [
+          {
+            "name": "target",
+            "full_name": "sample.target",
+            "type": "function",
+            "line": 6,
+            "column": 4,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def target",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "dict_dynamic",
+        "mode": "jedi",
+        "line": 42,
+        "expected": [
+          "sample:other",
+          "sample:target"
+        ],
+        "actual": [
+          "sample:other",
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:dispatch_dynamic",
+        "actual_owner": "sample:dispatch_dynamic",
+        "raw": [
+          {
+            "name": "target",
+            "full_name": "sample.target",
+            "type": "function",
+            "line": 6,
+            "column": 4,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def target",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          },
+          {
+            "name": "other",
+            "full_name": "sample.other",
+            "type": "function",
+            "line": 9,
+            "column": 4,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def other",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "register",
+        "mode": "jedi",
+        "line": 44,
+        "expected": [
+          "registry:register"
+        ],
+        "actual": [
+          "registry:register"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:<module>",
+        "actual_owner": "sample:<module>",
+        "raw": [
+          {
+            "name": "register",
+            "full_name": "registry.register",
+            "type": "function",
+            "line": 3,
+            "column": 4,
+            "module_path": "captured://fixture/registry.py",
+            "description": "def register",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "module",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "registry",
+        "mode": "jedi",
+        "line": 47,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:registered",
+        "actual_owner": "sample:registered",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive",
+          "no_accepted_definition_candidate",
+          "unknown_value_origin"
+        ],
+        "phase": "function_body",
+        "unknown_sources": true,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "import_alias",
+        "mode": "jedi",
+        "line": 50,
+        "expected": [
+          "helpers:work"
+        ],
+        "actual": [
+          "helpers:work"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:imported",
+        "actual_owner": "sample:imported",
+        "raw": [
+          {
+            "name": "work",
+            "full_name": "helpers.work",
+            "type": "function",
+            "line": 2,
+            "column": 4,
+            "module_path": "captured://fixture/helpers.py",
+            "description": "def work",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "shadow",
+        "mode": "jedi",
+        "line": 53,
+        "expected": [],
+        "actual": [],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:shadow",
+        "actual_owner": "sample:shadow",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive",
+          "no_accepted_definition_candidate",
+          "unknown_value_origin"
+        ],
+        "phase": "function_body",
+        "unknown_sources": true,
+        "exhaustive": false,
+        "complete_truth": false
+      },
+      {
+        "case": "bare",
+        "mode": "jedi",
+        "line": 60,
+        "expected": [],
+        "actual": [],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:A.bare",
+        "actual_owner": "sample:A.bare",
+        "raw": [],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive",
+          "no_accepted_definition_candidate",
+          "unknown_value_origin"
+        ],
+        "phase": "function_body",
+        "unknown_sources": true,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "staticmethod_callback",
+        "mode": "jedi",
+        "line": 64,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:A.invoke",
+        "actual_owner": "sample:A.invoke",
+        "raw": [
+          {
+            "name": "target",
+            "full_name": "sample.target",
+            "type": "function",
+            "line": 6,
+            "column": 4,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def target",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive",
+          "unknown_value_origin"
+        ],
+        "phase": "function_body",
+        "unknown_sources": true,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "classmethod_body",
+        "mode": "jedi",
+        "line": 68,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:A.construct",
+        "actual_owner": "sample:A.construct",
+        "raw": [
+          {
+            "name": "target",
+            "full_name": "sample.target",
+            "type": "function",
+            "line": 6,
+            "column": 4,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def target",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "instance",
+        "mode": "jedi",
+        "line": 72,
+        "expected": [
+          "sample:A.work"
+        ],
+        "actual": [
+          "sample:A.work"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:method_driver",
+        "actual_owner": "sample:method_driver",
+        "raw": [
+          {
+            "name": "work",
+            "full_name": "sample.A.work",
+            "type": "function",
+            "line": 56,
+            "column": 8,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def work",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "class_attribute",
+        "mode": "jedi",
+        "line": 73,
+        "expected": [
+          "sample:A.work"
+        ],
+        "actual": [
+          "sample:A.work"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:method_driver",
+        "actual_owner": "sample:method_driver",
+        "raw": [
+          {
+            "name": "work",
+            "full_name": "sample.A.work",
+            "type": "function",
+            "line": 56,
+            "column": 8,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def work",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "staticmethod_driver",
+        "mode": "jedi",
+        "line": 74,
+        "expected": [
+          "sample:A.invoke"
+        ],
+        "actual": [
+          "sample:A.invoke"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:method_driver",
+        "actual_owner": "sample:method_driver",
+        "raw": [
+          {
+            "name": "invoke",
+            "full_name": "sample.A.invoke",
+            "type": "function",
+            "line": 63,
+            "column": 8,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def invoke",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "classmethod_driver",
+        "mode": "jedi",
+        "line": 75,
+        "expected": [
+          "sample:A.construct"
+        ],
+        "actual": [
+          "sample:A.construct"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:method_driver",
+        "actual_owner": "sample:method_driver",
+        "raw": [
+          {
+            "name": "__get__",
+            "full_name": "builtins.classmethod.__get__",
+            "type": "function",
+            "line": 175,
+            "column": 8,
+            "module_path": "external://builtins/builtins.pyi",
+            "description": "def __get__",
+            "path_mapping": "external physical prefix omitted; not a captured definition",
+            "api": "infer"
+          },
+          {
+            "name": "construct",
+            "full_name": "sample.A.construct",
+            "type": "function",
+            "line": 67,
+            "column": 8,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def construct",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "goto_after_descriptor_rejection"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive",
+          "rejected_classmethod_descriptor_artifact"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "super",
+        "mode": "jedi",
+        "line": 83,
+        "expected": [
+          "sample:Base.run"
+        ],
+        "actual": [
+          "sample:Base.run"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:Child.run",
+        "actual_owner": "sample:Child.run",
+        "raw": [
+          {
+            "name": "run",
+            "full_name": "sample.Base.run",
+            "type": "function",
+            "line": 78,
+            "column": 8,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def run",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "inherited",
+        "mode": "jedi",
+        "line": 86,
+        "expected": [
+          "sample:Child.run"
+        ],
+        "actual": [
+          "sample:Child.run"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:inherited",
+        "actual_owner": "sample:inherited",
+        "raw": [
+          {
+            "name": "run",
+            "full_name": "sample.Child.run",
+            "type": "function",
+            "line": 82,
+            "column": 8,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def run",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "closure_body",
+        "mode": "jedi",
+        "line": 90,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:outer.inner",
+        "actual_owner": "sample:outer.inner",
+        "raw": [
+          {
+            "name": "target",
+            "full_name": "sample.target",
+            "type": "function",
+            "line": 6,
+            "column": 4,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def target",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "nested",
+        "mode": "jedi",
+        "line": 91,
+        "expected": [
+          "sample:outer.inner"
+        ],
+        "actual": [
+          "sample:outer.inner"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:outer",
+        "actual_owner": "sample:outer",
+        "raw": [
+          {
+            "name": "inner",
+            "full_name": null,
+            "type": "function",
+            "line": 89,
+            "column": 8,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def inner",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "factory",
+        "mode": "jedi",
+        "line": 97,
+        "expected": [
+          "sample:factory"
+        ],
+        "actual": [
+          "sample:factory"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:returned",
+        "actual_owner": "sample:returned",
+        "raw": [
+          {
+            "name": "factory",
+            "full_name": "sample.factory",
+            "type": "function",
+            "line": 93,
+            "column": 4,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def factory",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "returned",
+        "mode": "jedi",
+        "line": 98,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:returned",
+        "actual_owner": "sample:returned",
+        "raw": [
+          {
+            "name": "target",
+            "full_name": "sample.target",
+            "type": "function",
+            "line": 6,
+            "column": 4,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def target",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "lambda_body",
+        "mode": "jedi",
+        "line": 101,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:lambda_factory.<lambda>",
+        "actual_owner": "sample:lambda_factory.<lambda>",
+        "raw": [
+          {
+            "name": "target",
+            "full_name": "sample.target",
+            "type": "function",
+            "line": 6,
+            "column": 4,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def target",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "lambda_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "lambda_factory",
+        "mode": "jedi",
+        "line": 104,
+        "expected": [
+          "sample:lambda_factory"
+        ],
+        "actual": [
+          "sample:lambda_factory"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:lambda_driver",
+        "actual_owner": "sample:lambda_driver",
+        "raw": [
+          {
+            "name": "lambda_factory",
+            "full_name": "sample.lambda_factory",
+            "type": "function",
+            "line": 100,
+            "column": 4,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def lambda_factory",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "lambda_call",
+        "mode": "jedi",
+        "line": 105,
+        "expected": [
+          "sample:lambda_factory.<lambda>"
+        ],
+        "actual": [
+          "sample:lambda_factory.<lambda>"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:lambda_driver",
+        "actual_owner": "sample:lambda_driver",
+        "raw": [
+          {
+            "name": "<lambda>",
+            "full_name": null,
+            "type": "function",
+            "line": 101,
+            "column": 11,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def <lambda>",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "decorator_implicit",
+        "mode": "jedi",
+        "line": 113,
+        "expected": [
+          "sample:decorate"
+        ],
+        "actual": [
+          "sample:decorate"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:<module>",
+        "actual_owner": "sample:<module>",
+        "raw": [
+          {
+            "name": "decorate",
+            "full_name": "sample.decorate",
+            "type": "function",
+            "line": 107,
+            "column": 4,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def decorate",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "definition",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "default",
+        "mode": "jedi",
+        "line": 114,
+        "expected": [
+          "sample:make"
+        ],
+        "actual": [
+          "sample:make"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:<module>",
+        "actual_owner": "sample:<module>",
+        "raw": [
+          {
+            "name": "make",
+            "full_name": "sample.make",
+            "type": "function",
+            "line": 110,
+            "column": 4,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def make",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "definition",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "decorated_body",
+        "mode": "jedi",
+        "line": 115,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:decorated",
+        "actual_owner": "sample:decorated",
+        "raw": [
+          {
+            "name": "target",
+            "full_name": "sample.target",
+            "type": "function",
+            "line": 6,
+            "column": 4,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def target",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "branch",
+        "mode": "jedi",
+        "line": 122,
+        "expected": [
+          "sample:other",
+          "sample:target"
+        ],
+        "actual": [
+          "sample:other",
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:branch",
+        "actual_owner": "sample:branch",
+        "raw": [
+          {
+            "name": "target",
+            "full_name": "sample.target",
+            "type": "function",
+            "line": 6,
+            "column": 4,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def target",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          },
+          {
+            "name": "other",
+            "full_name": "sample.other",
+            "type": "function",
+            "line": 9,
+            "column": 4,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def other",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "reassignment",
+        "mode": "jedi",
+        "line": 127,
+        "expected": [
+          "sample:other"
+        ],
+        "actual": [
+          "sample:other"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:reassignment",
+        "actual_owner": "sample:reassignment",
+        "raw": [
+          {
+            "name": "other",
+            "full_name": "sample.other",
+            "type": "function",
+            "line": 9,
+            "column": 4,
+            "module_path": "captured://fixture/sample.py",
+            "description": "def other",
+            "path_mapping": "Jedi captured-mirror path; physical temporary prefix omitted",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive"
+        ],
+        "phase": "function_body",
+        "unknown_sources": false,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "external",
+        "mode": "jedi",
+        "line": 130,
+        "expected": [
+          "json:loads"
+        ],
+        "actual": [],
+        "missing": [
+          "json:loads"
+        ],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:boundary",
+        "actual_owner": "sample:boundary",
+        "raw": [
+          {
+            "name": "loads",
+            "full_name": "json.loads",
+            "type": "function",
+            "line": 299,
+            "column": 4,
+            "module_path": "external://json/__init__.py",
+            "description": "def loads",
+            "path_mapping": "external physical prefix omitted; not a captured definition",
+            "api": "infer"
+          }
+        ],
+        "reasons": [
+          "candidate_set_not_proven_exhaustive",
+          "external_or_excluded_definition",
+          "no_accepted_definition_candidate",
+          "unknown_value_origin"
+        ],
+        "phase": "function_body",
+        "unknown_sources": true,
+        "exhaustive": false,
+        "complete_truth": true
+      },
+      {
+        "case": "assignment",
+        "mode": "jedi",
+        "line": 133,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:references",
+        "actual_owner": null,
+        "raw": [],
+        "reasons": [],
+        "phase": null,
+        "unknown_sources": null,
+        "exhaustive": null,
+        "complete_truth": true
+      },
+      {
+        "case": "container",
+        "mode": "jedi",
+        "line": 134,
+        "expected": [
+          "sample:other",
+          "sample:target"
+        ],
+        "actual": [
+          "sample:other",
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:references",
+        "actual_owner": null,
+        "raw": [],
+        "reasons": [],
+        "phase": null,
+        "unknown_sources": null,
+        "exhaustive": null,
+        "complete_truth": true
+      },
+      {
+        "case": "factory_return",
+        "mode": "jedi",
+        "line": 94,
+        "expected": [
+          "sample:target"
+        ],
+        "actual": [
+          "sample:target"
+        ],
+        "missing": [],
+        "extra": [],
+        "forbidden": [],
+        "site_recorded": true,
+        "expected_owner": "sample:factory",
+        "actual_owner": null,
+        "raw": [],
+        "reasons": [],
+        "phase": null,
+        "unknown_sources": null,
+        "exhaustive": null,
+        "complete_truth": true
+      }
+    ]
+  }
+]

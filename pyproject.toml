@@ -141,7 +141,7 @@ codec = ["schema.proto"]
 
 [project.optional-dependencies]
 test = [
-    "jedi>=0.19",
+    "jedi==0.20.1",
     "pytest>=8.4.1",
     "pytest-asyncio>=1.0.0",
     "pytest-cov>=4.0.0",
@@ -229,7 +229,7 @@ ast-grep = [
     "pyyaml>=6.0",
 ]
 python-semantics = [
-    "jedi>=0.19",
+    "jedi==0.20.1",
 ]
 
 [tool.ruff]
@@ -259,6 +259,8 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
+# Frozen invalid source-only corpus: keep bytes and intentional undefined-name/lambda cases.
+"codebase_rag/tests/fixtures/python_accuracy/*.py" = ["I001", "F821", "PLW0108"]
 # Tests are outside Bandit's and SonarCloud's security scope too.
 "**/tests/**" = ["T201", "S"]
 "benchmarks/**" = ["T201"]
@@ -272,6 +274,7 @@ ignore = [
 "codebase_rag/embedded_graph/**" = ["S608"]
 
 [tool.ruff.format]
+exclude = ["codebase_rag/tests/fixtures/python_accuracy/*.py"]
 quote-style = "double"
 
 [tool.ty.environment]

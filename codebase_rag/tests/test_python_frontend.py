@@ -126,19 +126,18 @@ _ALIASED_REEXPORT = {
 
 
 def test_aliased_reexport_is_the_jedi_discriminator(tmp_path: Path) -> None:
-    # The heuristics drop an aliased re-export entirely; jedi follows the
-    # rename through __init__ to the real definition.
+    # Both the bounded Python profile and Jedi follow a project re-export.
     calls = _calls_edges_for(
         tmp_path, files=_ALIASED_REEXPORT, mode=cs.PythonFrontend.JEDI
     )
     assert ("proj.caller.use", "proj.pkg.impl.real_fn") in calls
 
 
-def test_heuristic_mode_stays_heuristic(tmp_path: Path) -> None:
+def test_default_profile_follows_project_reexport(tmp_path: Path) -> None:
     calls = _calls_edges_for(
         tmp_path, files=_ALIASED_REEXPORT, mode=cs.PythonFrontend.HEURISTIC
     )
-    assert ("proj.caller.use", "proj.pkg.impl.real_fn") not in calls
+    assert ("proj.caller.use", "proj.pkg.impl.real_fn") in calls
 
 
 def test_budget_exhaustion_degrades_to_heuristics(

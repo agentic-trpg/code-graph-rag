@@ -1,0 +1,701 @@
+{
+  "heuristic:reference_dict": {
+    "relations": [
+      {
+        "source": "fixture.sample",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 2,
+          "col": 14,
+          "end_line": 2,
+          "end_col": 20,
+          "resolution": "exact"
+        }
+      }
+    ]
+  },
+  "heuristic:reference_list": {
+    "relations": [
+      {
+        "source": "fixture.sample",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 3,
+          "col": 8,
+          "end_line": 3,
+          "end_col": 14,
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample",
+        "kind": "CALLS",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 3,
+          "col": 15,
+          "end_line": 3,
+          "end_col": 20,
+          "resolution": "exact"
+        }
+      }
+    ]
+  },
+  "heuristic:dispatch": {
+    "relations": [
+      {
+        "source": "fixture.sample.fixed",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 4,
+          "col": 8,
+          "end_line": 4,
+          "end_col": 14,
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample.fixed",
+        "kind": "CALLS",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 4,
+          "col": 19,
+          "end_line": 4,
+          "end_col": 24,
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample.dynamic",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 7,
+          "col": 8,
+          "end_line": 7,
+          "end_col": 14,
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample.dynamic",
+        "kind": "CALLS",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 7,
+          "col": 19,
+          "end_line": 7,
+          "end_col": 24,
+          "resolution": "exact"
+        }
+      }
+    ]
+  },
+  "heuristic:branch": {
+    "relations": [
+      {
+        "source": "fixture.sample.caller",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 5,
+          "col": 10,
+          "end_line": 5,
+          "end_col": 15,
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample.caller",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 4,
+          "col": 13,
+          "end_line": 4,
+          "end_col": 19,
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample.caller",
+        "kind": "CALLS",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 6,
+          "col": 1,
+          "end_line": 6,
+          "end_col": 5,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "exact"
+        }
+      }
+    ]
+  },
+  "heuristic:reassignment": {
+    "relations": [
+      {
+        "source": "fixture.sample.caller",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 5,
+          "col": 4,
+          "end_line": 5,
+          "end_col": 9,
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample.caller",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 4,
+          "col": 4,
+          "end_line": 4,
+          "end_col": 10,
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample.caller",
+        "kind": "CALLS",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 6,
+          "col": 1,
+          "end_line": 6,
+          "end_col": 5,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "exact"
+        }
+      }
+    ]
+  },
+  "heuristic:lambda": {
+    "relations": [
+      {
+        "source": "fixture.sample.factory",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 3,
+          "col": 15,
+          "end_line": 3,
+          "end_col": 23,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "exact"
+        }
+      }
+    ]
+  },
+  "heuristic:nested": {
+    "relations": [
+      {
+        "source": "fixture.sample.outer",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 3,
+          "col": 13,
+          "end_line": 3,
+          "end_col": 21,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample.outer",
+        "kind": "CALLS",
+        "target": "fixture.sample.outer.inner",
+        "properties": {
+          "line": 4,
+          "col": 1,
+          "end_line": 4,
+          "end_col": 8,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample.outer.inner",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 3,
+          "col": 13,
+          "end_line": 3,
+          "end_col": 21,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "exact"
+        }
+      }
+    ]
+  },
+  "heuristic:defaults": {
+    "relations": [
+      {
+        "source": "fixture.sample.f",
+        "kind": "CALLS",
+        "target": "fixture.sample.make",
+        "properties": {
+          "line": 3,
+          "col": 8,
+          "end_line": 3,
+          "end_col": 14,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample.f",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 3,
+          "col": 17,
+          "end_line": 3,
+          "end_col": 25,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample",
+        "kind": "CALLS",
+        "target": "fixture.sample.make",
+        "properties": {
+          "line": 3,
+          "col": 8,
+          "end_line": 3,
+          "end_col": 14,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "exact"
+        }
+      }
+    ]
+  },
+  "heuristic:bare": {
+    "relations": [
+      {
+        "source": "fixture.sample.A.bad",
+        "kind": "CALLS",
+        "target": "fixture.sample.A.work",
+        "properties": {
+          "line": 3,
+          "col": 15,
+          "end_line": 3,
+          "end_col": 21,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample.A.good",
+        "kind": "CALLS",
+        "target": "fixture.sample.A.work",
+        "properties": {
+          "line": 4,
+          "col": 21,
+          "end_line": 4,
+          "end_col": 27,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample.A.good",
+        "kind": "CALLS",
+        "target": "fixture.sample.A.work",
+        "properties": {
+          "line": 4,
+          "col": 21,
+          "end_line": 4,
+          "end_col": 27,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "heuristic"
+        }
+      }
+    ]
+  },
+  "heuristic:classmethod": {
+    "relations": [
+      {
+        "source": "fixture.sample.caller",
+        "kind": "CALLS",
+        "target": "fixture.sample.A.construct",
+        "properties": {
+          "line": 4,
+          "col": 15,
+          "end_line": 4,
+          "end_col": 26,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "exact"
+        }
+      }
+    ]
+  },
+  "heuristic:string": {
+    "relations": []
+  },
+  "jedi:reference_dict": {
+    "relations": [
+      {
+        "source": "fixture.sample",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 2,
+          "col": 14,
+          "end_line": 2,
+          "end_col": 20,
+          "resolution": "exact"
+        }
+      }
+    ]
+  },
+  "jedi:reference_list": {
+    "relations": [
+      {
+        "source": "fixture.sample",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 3,
+          "col": 8,
+          "end_line": 3,
+          "end_col": 14,
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample",
+        "kind": "CALLS",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 3,
+          "col": 15,
+          "end_line": 3,
+          "end_col": 20,
+          "resolution": "exact"
+        }
+      }
+    ]
+  },
+  "jedi:dispatch": {
+    "relations": [
+      {
+        "source": "fixture.sample.fixed",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 4,
+          "col": 8,
+          "end_line": 4,
+          "end_col": 14,
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample.fixed",
+        "kind": "CALLS",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 4,
+          "col": 19,
+          "end_line": 4,
+          "end_col": 24,
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample.dynamic",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 7,
+          "col": 8,
+          "end_line": 7,
+          "end_col": 14,
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample.dynamic",
+        "kind": "CALLS",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 7,
+          "col": 19,
+          "end_line": 7,
+          "end_col": 24,
+          "resolution": "exact"
+        }
+      }
+    ]
+  },
+  "jedi:branch": {
+    "relations": [
+      {
+        "source": "fixture.sample.caller",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 5,
+          "col": 10,
+          "end_line": 5,
+          "end_col": 15,
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample.caller",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 4,
+          "col": 13,
+          "end_line": 4,
+          "end_col": 19,
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample.caller",
+        "kind": "CALLS",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 6,
+          "col": 1,
+          "end_line": 6,
+          "end_col": 5,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "exact"
+        }
+      }
+    ]
+  },
+  "jedi:reassignment": {
+    "relations": [
+      {
+        "source": "fixture.sample.caller",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 5,
+          "col": 4,
+          "end_line": 5,
+          "end_col": 9,
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample.caller",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 4,
+          "col": 4,
+          "end_line": 4,
+          "end_col": 10,
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample.caller",
+        "kind": "CALLS",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 6,
+          "col": 1,
+          "end_line": 6,
+          "end_col": 5,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "exact"
+        }
+      }
+    ]
+  },
+  "jedi:lambda": {
+    "relations": [
+      {
+        "source": "fixture.sample.factory",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 3,
+          "col": 15,
+          "end_line": 3,
+          "end_col": 23,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "exact"
+        }
+      }
+    ]
+  },
+  "jedi:nested": {
+    "relations": [
+      {
+        "source": "fixture.sample.outer",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 3,
+          "col": 13,
+          "end_line": 3,
+          "end_col": 21,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample.outer",
+        "kind": "CALLS",
+        "target": "fixture.sample.outer.inner",
+        "properties": {
+          "line": 4,
+          "col": 1,
+          "end_line": 4,
+          "end_col": 8,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample.outer.inner",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 3,
+          "col": 13,
+          "end_line": 3,
+          "end_col": 21,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "exact"
+        }
+      }
+    ]
+  },
+  "jedi:defaults": {
+    "relations": [
+      {
+        "source": "fixture.sample.f",
+        "kind": "CALLS",
+        "target": "fixture.sample.make",
+        "properties": {
+          "line": 3,
+          "col": 8,
+          "end_line": 3,
+          "end_col": 14,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample.f",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 3,
+          "col": 17,
+          "end_line": 3,
+          "end_col": 25,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample",
+        "kind": "CALLS",
+        "target": "fixture.sample.make",
+        "properties": {
+          "line": 3,
+          "col": 8,
+          "end_line": 3,
+          "end_col": 14,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "exact"
+        }
+      }
+    ]
+  },
+  "jedi:bare": {
+    "relations": [
+      {
+        "source": "fixture.sample.A.bad",
+        "kind": "CALLS",
+        "target": "fixture.sample.A.work",
+        "properties": {
+          "line": 3,
+          "col": 15,
+          "end_line": 3,
+          "end_col": 21,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample.A.good",
+        "kind": "CALLS",
+        "target": "fixture.sample.A.work",
+        "properties": {
+          "line": 4,
+          "col": 21,
+          "end_line": 4,
+          "end_col": 27,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "exact"
+        }
+      },
+      {
+        "source": "fixture.sample.A.good",
+        "kind": "CALLS",
+        "target": "fixture.sample.A.work",
+        "properties": {
+          "line": 4,
+          "col": 21,
+          "end_line": 4,
+          "end_col": 27,
+          "arg_count": 0,
+          "kwarg_names": [],
+          "resolution": "exact"
+        }
+      }
+    ]
+  },
+  "jedi:classmethod": {
+    "relations": []
+  },
+  "jedi:string": {
+    "relations": []
+  }
+}

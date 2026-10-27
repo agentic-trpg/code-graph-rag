@@ -2123,6 +2123,7 @@ def _js_named_function(node: Node) -> tuple[str, Node] | None:
 
 class CallProcessor:
     __slots__ = (
+        "_python_accuracy_bundle",
         "ingestor",
         "_note_unresolved",
         "_site_node",
@@ -2320,6 +2321,15 @@ class CallProcessor:
         to_spec: tuple[str, str, str],
         properties: PropertyDict | None = None,
     ) -> None:
+        if rel_type in (
+            cs.RelationshipType.CALLS,
+            cs.RelationshipType.REFERENCES,
+            cs.RelationshipType.INSTANTIATES,
+        ):
+            from ..integration.native import python_source
+
+            if python_source(self, str(from_spec[2])):
+                return
         # Every CALLS/REFERENCES/INSTANTIATES edge this processor emits goes
         # through here so the current site (line/col/arg shape of the
         # producing expression) rides along as edge properties (#1522).
@@ -2898,6 +2908,7 @@ class CallProcessor:
         return tuple(names)
 
     def reset_resolution_caches(self) -> None:
+        self._python_accuracy_bundle = None
         self._resolver.reset_resolution_caches()
         self._resolver.type_inference.reset_semantic_join_memos()
         # Both indexes are derived from module_qn_to_file_path and rebuilt
@@ -2925,6 +2936,10 @@ class CallProcessor:
         queries: Mapping[cs.SupportedLanguage, LanguageQueries],
         func_class_captures_cache: dict[Path, dict] | None = None,
     ) -> None:
+        if language == cs.SupportedLanguage.PYTHON:
+            from ..integration.native import emit
+
+            emit(self, file_path)
         relative_path = cached_relative_path(file_path, self.repo_path)
         logger.debug(ls.CALL_PROCESSING_FILE, path=relative_path)
         # A re-walk describes the file's current source; appending to the old

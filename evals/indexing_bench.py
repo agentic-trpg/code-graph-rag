@@ -57,6 +57,8 @@ _FILE = cs.NodeLabel.FILE.value
 
 
 def _peak_rss_mib() -> float | None:
+    if sys.platform == "win32":
+        return None
     try:
         import resource
     except ImportError:  # Windows has no resource module

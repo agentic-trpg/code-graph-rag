@@ -1,0 +1,688 @@
+{
+  "heuristic:reference_dict": {
+    "relations": [
+      {
+        "source": "fixture.sample",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 2,
+          "col": 14,
+          "phase": "module",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      }
+    ]
+  },
+  "heuristic:reference_list": {
+    "relations": [
+      {
+        "source": "fixture.sample",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 3,
+          "col": 8,
+          "phase": "module",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 3,
+          "col": 15,
+          "phase": "module",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      }
+    ]
+  },
+  "heuristic:dispatch": {
+    "relations": [
+      {
+        "source": "fixture.sample.fixed",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 4,
+          "col": 8,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.fixed",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 4,
+          "col": 19,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.fixed",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 5,
+          "col": 1,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.dynamic",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 7,
+          "col": 8,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.dynamic",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 7,
+          "col": 19,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.dynamic",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 8,
+          "col": 1,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.dynamic",
+        "kind": "CALLS",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 8,
+          "col": 1,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      }
+    ]
+  },
+  "heuristic:branch": {
+    "relations": [
+      {
+        "source": "fixture.sample.caller",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 4,
+          "col": 13,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.caller",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 5,
+          "col": 10,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.caller",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 6,
+          "col": 1,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.caller",
+        "kind": "CALLS",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 6,
+          "col": 1,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      }
+    ]
+  },
+  "heuristic:reassignment": {
+    "relations": [
+      {
+        "source": "fixture.sample.caller",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 4,
+          "col": 4,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.caller",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 5,
+          "col": 4,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.caller",
+        "kind": "CALLS",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 6,
+          "col": 1,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      }
+    ]
+  },
+  "heuristic:lambda": {
+    "relations": [
+      {
+        "source": "fixture.sample.factory.<lambda>#1",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 3,
+          "col": 15,
+          "phase": "lambda_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      }
+    ]
+  },
+  "heuristic:nested": {
+    "relations": [
+      {
+        "source": "fixture.sample.outer.inner",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 3,
+          "col": 13,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.outer",
+        "kind": "CALLS",
+        "target": "fixture.sample.outer.inner",
+        "properties": {
+          "line": 4,
+          "col": 1,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      }
+    ]
+  },
+  "heuristic:defaults": {
+    "relations": [
+      {
+        "source": "fixture.sample",
+        "kind": "CALLS",
+        "target": "fixture.sample.make",
+        "properties": {
+          "line": 3,
+          "col": 8,
+          "phase": "definition",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.f",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 3,
+          "col": 17,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      }
+    ]
+  },
+  "heuristic:bare": {
+    "relations": [
+      {
+        "source": "fixture.sample.A.good",
+        "kind": "CALLS",
+        "target": "fixture.sample.A.work",
+        "properties": {
+          "line": 4,
+          "col": 16,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      }
+    ]
+  },
+  "heuristic:classmethod": {
+    "relations": [
+      {
+        "source": "fixture.sample.caller",
+        "kind": "CALLS",
+        "target": "fixture.sample.A.construct",
+        "properties": {
+          "line": 4,
+          "col": 13,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.caller",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.A",
+        "properties": {
+          "line": 4,
+          "col": 13,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      }
+    ]
+  },
+  "heuristic:string": {
+    "relations": []
+  },
+  "jedi:reference_dict": {
+    "relations": [
+      {
+        "source": "fixture.sample",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 2,
+          "col": 14,
+          "phase": "module",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      }
+    ]
+  },
+  "jedi:reference_list": {
+    "relations": [
+      {
+        "source": "fixture.sample",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 3,
+          "col": 8,
+          "phase": "module",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 3,
+          "col": 15,
+          "phase": "module",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      }
+    ]
+  },
+  "jedi:dispatch": {
+    "relations": [
+      {
+        "source": "fixture.sample.fixed",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 4,
+          "col": 8,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.fixed",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 4,
+          "col": 19,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.fixed",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 5,
+          "col": 1,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.dynamic",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 7,
+          "col": 8,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.dynamic",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 7,
+          "col": 19,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.dynamic",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 8,
+          "col": 1,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.dynamic",
+        "kind": "CALLS",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 8,
+          "col": 1,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      }
+    ]
+  },
+  "jedi:branch": {
+    "relations": [
+      {
+        "source": "fixture.sample.caller",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 4,
+          "col": 13,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.caller",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 5,
+          "col": 10,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.caller",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 6,
+          "col": 1,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.caller",
+        "kind": "CALLS",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 6,
+          "col": 1,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      }
+    ]
+  },
+  "jedi:reassignment": {
+    "relations": [
+      {
+        "source": "fixture.sample.caller",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 4,
+          "col": 4,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.caller",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 5,
+          "col": 4,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.caller",
+        "kind": "CALLS",
+        "target": "fixture.sample.other",
+        "properties": {
+          "line": 6,
+          "col": 1,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      }
+    ]
+  },
+  "jedi:lambda": {
+    "relations": [
+      {
+        "source": "fixture.sample.factory.<lambda>#1",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 3,
+          "col": 15,
+          "phase": "lambda_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      }
+    ]
+  },
+  "jedi:nested": {
+    "relations": [
+      {
+        "source": "fixture.sample.outer.inner",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 3,
+          "col": 13,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.outer",
+        "kind": "CALLS",
+        "target": "fixture.sample.outer.inner",
+        "properties": {
+          "line": 4,
+          "col": 1,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      }
+    ]
+  },
+  "jedi:defaults": {
+    "relations": [
+      {
+        "source": "fixture.sample",
+        "kind": "CALLS",
+        "target": "fixture.sample.make",
+        "properties": {
+          "line": 3,
+          "col": 8,
+          "phase": "definition",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.f",
+        "kind": "CALLS",
+        "target": "fixture.sample.target",
+        "properties": {
+          "line": 3,
+          "col": 17,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      }
+    ]
+  },
+  "jedi:bare": {
+    "relations": [
+      {
+        "source": "fixture.sample.A.good",
+        "kind": "CALLS",
+        "target": "fixture.sample.A.work",
+        "properties": {
+          "line": 4,
+          "col": 16,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      }
+    ]
+  },
+  "jedi:classmethod": {
+    "relations": [
+      {
+        "source": "fixture.sample.caller",
+        "kind": "CALLS",
+        "target": "fixture.sample.A.construct",
+        "properties": {
+          "line": 4,
+          "col": 13,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      },
+      {
+        "source": "fixture.sample.caller",
+        "kind": "REFERENCES",
+        "target": "fixture.sample.A",
+        "properties": {
+          "line": 4,
+          "col": 13,
+          "phase": "function_body",
+          "resolution": "candidate",
+          "exhaustive": false
+        }
+      }
+    ]
+  },
+  "jedi:string": {
+    "relations": []
+  }
+}

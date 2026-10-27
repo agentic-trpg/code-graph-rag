@@ -5,10 +5,11 @@ import tomllib
 from collections.abc import Iterator, Mapping, Sequence
 from functools import lru_cache
 from pathlib import Path
-from typing import NamedTuple
+from typing import NamedTuple, cast
 
 from loguru import logger
 from tree_sitter import Node, Parser
+from typing_extensions import CapsuleType
 
 from .. import constants as cs
 from .. import logs as ls
@@ -6956,7 +6957,9 @@ class ImportProcessor:
                 grammar = importlib.import_module(
                     f"{cs.TREE_SITTER_MODULE_PREFIX}julia"
                 )
-                parser = Parser(Language(grammar.language()))
+                # The pinned grammar returns PyCapsule; dynamic import otherwise selects
+                # Language's deprecated integer overload during type checking.
+                parser = Parser(Language(cast(CapsuleType, grammar.language())))
             except Exception:
                 parser = None
             cls._julia_ts_parser = parser

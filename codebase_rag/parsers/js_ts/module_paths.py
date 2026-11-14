@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import posixpath
 from pathlib import Path, PurePosixPath
 from typing import NamedTuple
@@ -11,6 +10,7 @@ from ... import constants as cs
 from ... import logs as ls
 from ...types_defs import JsonValue
 from ...utils.json_io import loads_json
+from ...utils.path_utils import is_symlink_entry, should_skip_rel_file, walk_repo_dirs
 
 
 class _ManifestTargets(NamedTuple):
@@ -22,22 +22,29 @@ class _ManifestTargets(NamedTuple):
     claimed: bool
 
 
-def discover_js_workspace_packages(repo_path: Path) -> list[tuple[str, Path]]:
+def discover_js_workspace_packages(
+    repo_path: Path,
+    exclude_paths: frozenset[str] | None = None,
+    unignore_paths: frozenset[str] | None = None,
+) -> list[tuple[str, Path]]:
+    """Map eligible workspace package manifests to their package directories."""
     # A monorepo application imports a sibling package by its manifest NAME
     # (`@acme/sdk/admin`), which no relative-path arithmetic can resolve, the
     # same problem a Go module directive solves for Go. Map every first-party
     # package.json name to its directory, longest name first so a nested
     # package shadows an enclosing one whose name is a prefix of it.
     packages: list[tuple[str, Path]] = []
-    for directory, subdirs, filenames in os.walk(repo_path):
-        # Prune rather than filter afterwards: node_modules holds more
-        # package.json files than the repo does, and every project pays this
-        # walk, including ones with no JavaScript at all.
-        subdirs[:] = [d for d in subdirs if d not in cs.IGNORE_PATTERNS]
-        if cs.DEP_FILE_PACKAGE_JSON not in filenames:
+    for directory, parts, _, prefix, filenames in walk_repo_dirs(
+        repo_path, exclude_paths, unignore_paths
+    ):
+        if cs.DEP_FILE_PACKAGE_JSON not in filenames or should_skip_rel_file(
+            f"{prefix}{cs.DEP_FILE_PACKAGE_JSON}", parts, exclude_paths, unignore_paths
+        ):
             continue
         package_dir = Path(directory)
         manifest = package_dir / cs.DEP_FILE_PACKAGE_JSON
+        if is_symlink_entry(manifest):
+            continue
         try:
             manifest_data = loads_json(
                 manifest.read_text(encoding=cs.ENCODING_UTF8_SIG)

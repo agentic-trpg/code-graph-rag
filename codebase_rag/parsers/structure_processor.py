@@ -14,7 +14,9 @@ from ..utils.path_utils import (
     cached_relative_path,
     cached_resolve_posix,
     is_symlink_entry,
+    is_walked_dir,
     should_skip_path,
+    walk_repo_dirs,
 )
 
 
@@ -105,25 +107,38 @@ class StructureProcessor:
         The repo root is always included: every directory's parent lookup
         resolves against it, and it is the fallback container.
         """
+        if only is not None:
+            return {self.repo_path} | {
+                self.repo_path / key for key in only if self._reachable_directory(key)
+            }
         directories = {self.repo_path}
-        for path in self.repo_path.rglob(cs.GLOB_ALL):
-            # A linked directory is not walked (issue #2451), so it gets no
-            # container either: an in-repo one was an empty Package whose
-            # absolute path was its target's.
-            if not path.is_dir() or is_symlink_entry(path):
-                continue
-            if only is not None and (
-                cached_relative_path(path, self.repo_path).as_posix() not in only
-            ):
-                continue
-            if not should_skip_path(
-                path,
-                self.repo_path,
-                exclude_paths=self.exclude_paths,
-                unignore_paths=self.unignore_paths,
+        for directory, _, _, _, _ in walk_repo_dirs(
+            self.repo_path, self.exclude_paths, self.unignore_paths
+        ):
+            path = Path(directory)
+            if path != self.repo_path and not should_skip_path(
+                path, self.repo_path, self.exclude_paths, self.unignore_paths, False
             ):
                 directories.add(path)
         return directories
+
+    def _reachable_directory(self, key: str) -> bool:
+        """Check a scoped directory and its ancestors using the walk policy."""
+        relative = Path(key)
+        if relative == Path(".") or relative.anchor or ".." in relative.parts:
+            return False
+        path = self.repo_path / relative
+        return (
+            is_walked_dir(relative.parts, self.exclude_paths, self.unignore_paths)
+            and path.is_dir()
+            and not any(
+                is_symlink_entry(self.repo_path / part)
+                for part in (relative, *relative.parents[:-1])
+            )
+            and not should_skip_path(
+                path, self.repo_path, self.exclude_paths, self.unignore_paths, False
+            )
+        )
 
     def _emit_package(
         self,

@@ -614,6 +614,30 @@ def _skipped_link(
     return True
 
 
+def walk_repo_dirs(
+    repo_path: Path,
+    exclude_paths: frozenset[str] | None = None,
+    unignore_paths: frozenset[str] | None = None,
+    on_symlink: Callable[[str], None] | None = None,
+) -> Iterator[tuple[str, tuple[str, ...], str, str, list[str]]]:
+    """Yield each reachable directory, its relative keys and its raw filenames.
+
+    Prune excluded directories and symbolic links before descent. Callers
+    apply their own rules to filenames, including repository metadata.
+    """
+    repo_str = str(repo_path)
+    repo_prefix_len = len(repo_str) + (0 if repo_str.endswith(os.sep) else 1)
+    for dirpath, dirnames, filenames in os.walk(repo_str):
+        dir_parts, dir_key, dir_prefix = _walk_dir_keys(dirpath, repo_prefix_len)
+        dirnames[:] = sorted(
+            d
+            for d in dirnames
+            if should_keep_dir(d, dir_prefix, exclude_paths, unignore_paths)
+            and not _skipped_link(dirpath, d, f"{dir_prefix}{d}", on_symlink)
+        )
+        yield dirpath, dir_parts, dir_key, dir_prefix, filenames
+
+
 def walk_eligible_files(
     repo_path: Path,
     exclude_paths: frozenset[str] | None = None,
@@ -623,7 +647,7 @@ def walk_eligible_files(
 ) -> Iterator[tuple[str, str, str]]:
     """Yield ``(dirpath, filename, rel_path)`` for every indexable file, in order.
 
-    The single definition of the repository walk. Both the tree-sitter indexer
+    Both the tree-sitter indexer
     (``GraphUpdater._collect_eligible_files``) and the C++ module-qn map
     (``cpp_frontend.qn.build_module_qn_map``) consume it, because the module-qn
     disambiguation rule hands the base qn to whichever file is seen FIRST and
@@ -641,22 +665,12 @@ def walk_eligible_files(
     receives the repo-relative path of each one the ignore rules would
     otherwise have let through, file or directory.
     """
-    repo_str = str(repo_path)
-    # A repo path that already ends in a separator (the filesystem root, "/")
-    # must not have another counted, or the slice below eats the first
-    # character of every child -- "/tmp" became "mp" (CodeRabbit, PR #1511).
-    repo_prefix_len = len(repo_str) + (0 if repo_str.endswith(os.sep) else 1)
     state_filenames = cs.CGR_STATE_FILENAMES
-    for dirpath, dirnames, filenames in os.walk(repo_str):
-        dir_parts, dir_key, dir_prefix = _walk_dir_keys(dirpath, repo_prefix_len)
+    for dirpath, dir_parts, dir_key, dir_prefix, filenames in walk_repo_dirs(
+        repo_path, exclude_paths, unignore_paths, on_symlink
+    ):
         if on_dir is not None:
             on_dir(dir_key, dirpath)
-        dirnames[:] = sorted(
-            d
-            for d in dirnames
-            if should_keep_dir(d, dir_prefix, exclude_paths, unignore_paths)
-            and not _skipped_link(dirpath, d, f"{dir_prefix}{d}", on_symlink)
-        )
         for fname in sorted(filenames):
             if fname in state_filenames:
                 continue

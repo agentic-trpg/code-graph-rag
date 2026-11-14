@@ -98,6 +98,7 @@ from .parsers.frontends import (
     FrontendPhase,
     SemanticFacts,
 )
+from .parsers.frontends.go import GoFrontend
 from .parsers.frontends.protocol import QueryCall
 from .parsers.go import interfaces as go_ifaces
 from .parsers.go import read_package_clause
@@ -2087,7 +2088,18 @@ class GraphUpdater:
         if off:
             return None
         frontend = FRONTENDS.get(language)
-        if frontend is None or not frontend.applies(self.repo_path):
+        if frontend is None:
+            return None
+        applies = (
+            frontend.applies(
+                self.repo_path,
+                exclude_paths=self.exclude_paths,
+                unignore_paths=self.unignore_paths,
+            )
+            if isinstance(frontend, GoFrontend)
+            else frontend.applies(self.repo_path)
+        )
+        if not applies:
             # Skip silently when the frontend has nothing to augment (no C#
             # project, no go.mod): applicability is the frontend's own rule
             # (issue #1178), so a registered replacement can define its own.
@@ -2102,6 +2114,14 @@ class GraphUpdater:
                 logger.warning(unavailable_log)
             return None
         logger.info(running_log.format(path=find_root(self.repo_path)))
+        if isinstance(frontend, GoFrontend):
+            return frontend.run(
+                self.repo_path,
+                (),
+                rescued_files=self._rescued_files(),
+                exclude_paths=self.exclude_paths,
+                unignore_paths=self.unignore_paths,
+            )
         return frontend.run(self.repo_path, (), rescued_files=self._rescued_files())
 
     def _rescued_files(self) -> frozenset[str]:
@@ -2152,7 +2172,9 @@ class GraphUpdater:
             cs.SupportedLanguage.GO,
             off=mode == cs.GoFrontend.TREESITTER,
             auto=mode == cs.GoFrontend.AUTO,
-            find_root=find_go_module,
+            find_root=lambda repo: find_go_module(
+                repo, self.exclude_paths, self.unignore_paths
+            ),
             auto_fallback_log=ls.GO_FRONTEND_AUTO_FALLBACK,
             unavailable_log=ls.GO_FRONTEND_UNAVAILABLE,
             running_log=ls.GO_FRONTEND_RUNNING,
@@ -7299,7 +7321,11 @@ class GraphUpdater:
         # directory lets a toolchain probe that times out reuse an earlier
         # run's answer instead of reading as a missing toolchain.
         if stored is None or stored != compute_parser_fingerprint(
-            repo_path=self.repo_path, capture=self.capture, state_dir=self.state_dir
+            repo_path=self.repo_path,
+            capture=self.capture,
+            state_dir=self.state_dir,
+            exclude_paths=self.exclude_paths,
+            unignore_paths=self._configured_unignore_paths,
         ):
             self._parser_changed = True
             logger.warning(ls.PARSER_FINGERPRINT_MISMATCH)
@@ -7426,7 +7452,9 @@ class GraphUpdater:
         # them as Java import-probe roots, and stamp their modules generated.
         # Recomputed per run so a build that appears between watch runs is
         # picked up; no roots leaves everything exactly as before.
-        roots = discover_generated_source_roots(self.repo_path)
+        roots = discover_generated_source_roots(
+            self.repo_path, self.exclude_paths, self._configured_unignore_paths
+        )
         dp = self.factory.definition_processor
         dp.generated_source_prefixes = generated_prefixes_for(roots)
         self.factory.import_processor.set_java_generated_roots(roots)
@@ -7457,7 +7485,9 @@ class GraphUpdater:
         # affected files' cached hashes still match the checked-in source,
         # so without forcing them through a reparse the graph would keep
         # stale (or never gain) generated members.
-        self._delombok_overlay = build_delombok_overlay(self.repo_path)
+        self._delombok_overlay = build_delombok_overlay(
+            self.repo_path, self.exclude_paths, self._configured_unignore_paths
+        )
         previous = _load_delombok_state(self.state_dir / cs.DELOMBOK_STATE_FILENAME)
         current = {
             "identity": overlay_identity(self._delombok_overlay),
@@ -8547,7 +8577,11 @@ class GraphUpdater:
             is_full_build or (self._parser_changed and self._single_file is None)
         ):
             self._pending_parser_fingerprint = compute_parser_fingerprint(
-                repo_path=self.repo_path, capture=self.capture, state_dir=self.state_dir
+                repo_path=self.repo_path,
+                capture=self.capture,
+                state_dir=self.state_dir,
+                exclude_paths=self.exclude_paths,
+                unignore_paths=self._configured_unignore_paths,
             )
 
     def _pre_parse_changed_files(

@@ -974,7 +974,7 @@ def test_a_reused_updater_joins_a_go_fact_against_the_renamed_module(
     monkeypatch.setattr(gu.settings, "GO_FRONTEND", cs.GoFrontend.GOTYPES)
     monkeypatch.setattr(go_fe, "go_frontend_available", lambda: True)
     monkeypatch.setattr(
-        go_fe, "run_go_frontend", lambda repo_path, ignored_dirs: holder["facts"]
+        go_fe, "run_go_frontend", lambda repo_path, **kwargs: holder["facts"]
     )
 
     root = temp_repo / "proj"

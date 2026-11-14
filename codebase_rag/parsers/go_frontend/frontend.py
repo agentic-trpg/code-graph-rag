@@ -165,11 +165,16 @@ def resolve_go_frontend() -> cs.GoFrontend:
     )
 
 
-def find_go_module(repo_path: Path) -> Path | None:
+def find_go_module(
+    repo_path: Path,
+    exclude_paths: frozenset[str] | None = None,
+    unignore_paths: frozenset[str] | None = None,
+) -> Path | None:
+    """Return the root-most eligible go.mod for applicability and logging."""
     # The root-most module's go.mod (shortest anchor path), or None when the
     # repo has no non-ignored go.mod. Applicability only needs its presence;
     # the path is used for logging.
-    mappings = discover_go_module_paths(repo_path)
+    mappings = discover_go_module_paths(repo_path, exclude_paths, unignore_paths)
     if not mappings:
         return None
     anchor = min(
@@ -485,11 +490,21 @@ def _parse_payload(stdout: str, stderr: str = "") -> GoSemanticFacts | None:
     return facts
 
 
-def _module_anchors(repo_path: Path) -> list[Path]:
+def _module_anchors(
+    repo_path: Path,
+    exclude_paths: frozenset[str] | None,
+    unignore_paths: frozenset[str] | None,
+) -> list[Path]:
+    """Return the eligible module directories in compiler invocation order."""
     # One tool invocation per module root: `./...` never descends into a
     # nested go.mod (its own module boundary), so a single root run would
     # silently miss every nested module's local calls (issue #1227).
-    anchors = {anchor for _, _, anchor in discover_go_module_paths(repo_path)}
+    anchors = {
+        anchor
+        for _, _, anchor in discover_go_module_paths(
+            repo_path, exclude_paths, unignore_paths
+        )
+    }
     return sorted(anchors)
 
 
@@ -574,12 +589,17 @@ def _run_tool_once(
 
 
 def run_go_frontend(
-    repo_path: Path, ignored_dirs: frozenset[str] = cs.IGNORE_PATTERNS
+    repo_path: Path,
+    ignored_dirs: frozenset[str] = cs.IGNORE_PATTERNS,
+    *,
+    exclude_paths: frozenset[str] | None = None,
+    unignore_paths: frozenset[str] | None = None,
 ) -> GoSemanticFacts:
+    """Collect compiler facts from the eligible Go module roots."""
     go = shutil.which(_GO)
     if go is None:
         return _empty_facts()
-    anchors = _module_anchors(repo_path)
+    anchors = _module_anchors(repo_path, exclude_paths, unignore_paths)
     if not anchors:
         return _empty_facts()
     binary = _build_tool(go)

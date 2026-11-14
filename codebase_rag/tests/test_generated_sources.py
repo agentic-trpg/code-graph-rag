@@ -12,6 +12,7 @@ from unittest.mock import MagicMock
 from codebase_rag.capture import ALL_ENABLED
 from codebase_rag.graph_updater import GraphUpdater
 from codebase_rag.parser_loader import load_parsers
+from codebase_rag.parsers.import_processor import ImportProcessor
 from codebase_rag.parsers.java_generated import (
     discover_generated_source_roots,
     generated_prefixes_for,
@@ -28,6 +29,38 @@ _WIDGET = (
     "    private String name;\n\n    public String getName() {\n"
     "        return this.name;\n    }\n}\n"
 )
+
+
+def test_generated_import_probe_skips_excluded_and_linked_candidates(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "proj"
+    root = ("target", "generated-sources", "annotations")
+    generated = repo.joinpath(*root)
+    (generated / "com/allowed").mkdir(parents=True)
+    (generated / "com/blocked").mkdir()
+    (generated / "com/allowed/Widget.java").write_text(_WIDGET, encoding="utf-8")
+    (generated / "com/blocked/Widget.java").write_text(_WIDGET, encoding="utf-8")
+    processor = ImportProcessor(
+        repo,
+        "proj",
+        exclude_paths=frozenset({"target/generated-sources/annotations/com/blocked/"}),
+        unignore_paths=frozenset({"target/generated-sources/annotations/**"}),
+    )
+    processor.set_java_generated_roots([root])
+    assert processor._java_source_root_prefix_cached("com.allowed.Widget") == (
+        "target.generated-sources.annotations."
+    )
+    assert processor._java_source_root_prefix_cached("com.blocked.Widget") is None
+
+    external = tmp_path / "external"
+    external.mkdir()
+    (external / "Widget.java").write_text(_WIDGET, encoding="utf-8")
+    try:
+        (generated / "com/linked").symlink_to(external, target_is_directory=True)
+    except (OSError, NotImplementedError):
+        return
+    assert processor._java_source_root_prefix_cached("com.linked.Widget") is None
 
 
 def _run(repo: Path) -> MagicMock:

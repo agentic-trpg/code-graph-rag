@@ -43,6 +43,9 @@ from ..utils.path_utils import (
     base_module_qn,
     cached_relative_path,
     declaration_extension,
+    is_eligible_rel_file,
+    is_symlink_entry,
+    is_walked_dir,
     module_extension,
     should_keep_dir,
     should_skip_rel_file,
@@ -1909,7 +1912,9 @@ class ImportProcessor:
         # assumption. Map each go.mod module directive to its directory once so local
         # imports rewrite to project-prefixed qns and unmapped (external) paths stay
         # recognisably slash-separated.
-        go_module_paths = discover_go_module_paths(repo_path)
+        go_module_paths = discover_go_module_paths(
+            repo_path, exclude_paths, unignore_paths
+        )
 
         @lru_cache(maxsize=4096)
         def _map_go_import_path_cached(import_path: str) -> str | None:
@@ -1921,7 +1926,9 @@ class ImportProcessor:
         # (`@acme/sdk/admin`), which no relative-path arithmetic resolves, so
         # map every first-party package.json name to its directory once, the
         # same way go.mod module directives are mapped above (issue #945).
-        js_workspace_packages = discover_js_workspace_packages(repo_path)
+        js_workspace_packages = discover_js_workspace_packages(
+            repo_path, exclude_paths, unignore_paths
+        )
 
         @lru_cache(maxsize=4096)
         def _map_js_workspace_import_cached(
@@ -1966,17 +1973,48 @@ class ImportProcessor:
             # a nested-class member (Outer.Inner.CONSTANT) two or more, so
             # every ancestor is probed.
             parts = import_path.split(cs.SEPARATOR_DOT)
+            generated_roots = set(self.java_generated_roots)
+
+            def eligible_generated_path(path: Path, *, file: bool) -> bool:
+                """Check a generated probe against the indexed walk and link rule."""
+                rel_parts = path.relative_to(repo_path).parts
+                if not is_walked_dir(
+                    rel_parts[:-1] if file else rel_parts,
+                    self.exclude_paths,
+                    self.unignore_paths,
+                ):
+                    return False
+                if file and not is_eligible_rel_file(
+                    path.relative_to(repo_path).as_posix(),
+                    self.exclude_paths,
+                    self.unignore_paths,
+                ):
+                    return False
+                return not any(
+                    is_symlink_entry(repo_path.joinpath(*rel_parts[:end]))
+                    for end in range(1, len(rel_parts) + 1)
+                )
+
             for root in (
                 (),
                 *cs.JAVA_MAVEN_SOURCE_ROOTS,
                 *self.java_generated_roots,
             ):
                 base = repo_path.joinpath(*root)
-                if base.joinpath(*parts).is_dir() or any(
-                    base.joinpath(
-                        *parts[: end - 1], f"{parts[end - 1]}{cs.EXT_JAVA}"
-                    ).is_file()
+                generated = root in generated_roots
+                directory = base.joinpath(*parts)
+                if (
+                    (not generated or eligible_generated_path(directory, file=False))
+                    and directory.is_dir()
+                ) or any(
+                    (not generated or eligible_generated_path(candidate, file=True))
+                    and candidate.is_file()
                     for end in range(len(parts), 0, -1)
+                    for candidate in (
+                        base.joinpath(
+                            *parts[: end - 1], f"{parts[end - 1]}{cs.EXT_JAVA}"
+                        ),
+                    )
                 ):
                     return (
                         cs.SEPARATOR_DOT.join(root) + cs.SEPARATOR_DOT if root else ""

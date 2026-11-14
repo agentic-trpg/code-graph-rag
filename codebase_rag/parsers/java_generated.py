@@ -11,70 +11,95 @@ Java import-probe roots, and stamp their modules `generated: true`.
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
-from ..utils.path_utils import should_keep_dir
+from ..utils.path_utils import (
+    is_symlink_entry,
+    is_walked_dir,
+    should_skip_rel_file,
+    walk_repo_dirs,
+)
 
 _BUILD_FILES = ("pom.xml", "build.gradle", "build.gradle.kts")
 _MAVEN_GENERATED = ("target", "generated-sources")
 _GRADLE_GENERATED = ("build", "generated", "sources", "annotationProcessor")
 
 
-def _build_dirs(repo_path: Path) -> list[Path]:
-    # Directories holding a build file, found with the standard prune so
-    # vendored trees never contribute (the generated dirs themselves are
-    # probed by EXACT subpath, never walked into here).
-    out: list[Path] = []
-    repo_str = str(repo_path)
-    prefix_len = len(repo_str) + 1
-    for dirpath, dirnames, filenames in os.walk(repo_str):
-        rel_dir = (
-            dirpath[prefix_len:].replace(os.sep, "/")
-            if len(dirpath) >= prefix_len
-            else ""
+def _build_dirs(
+    repo_path: Path,
+    exclude_paths: frozenset[str] | None,
+    unignore_paths: frozenset[str] | None,
+) -> list[Path]:
+    """Find reachable directories containing an eligible build file."""
+    return [
+        Path(directory)
+        for directory, parts, _, prefix, filenames in walk_repo_dirs(
+            repo_path, exclude_paths, unignore_paths
         )
-        dir_prefix = f"{rel_dir}/" if rel_dir else ""
-        dirnames[:] = sorted(
-            d for d in dirnames if should_keep_dir(d, dir_prefix, None, None)
+        if any(
+            name in filenames
+            and not should_skip_rel_file(
+                f"{prefix}{name}", parts, exclude_paths, unignore_paths
+            )
+            and not is_symlink_entry(Path(directory) / name)
+            for name in _BUILD_FILES
         )
-        if any(name in filenames for name in _BUILD_FILES):
-            out.append(Path(dirpath))
-    return out
+    ]
 
 
-def _package_roots(generated_dir: Path, depth: int) -> list[Path]:
+def _package_roots(
+    repo_path: Path,
+    generated_dir: Path,
+    depth: int,
+    exclude_paths: frozenset[str] | None,
+) -> list[Path]:
+    """Find package roots below a known generator output, respecting excludes."""
     # The processor-named (maven: annotations/, protobuf/) or
     # sourceSet-named (gradle: java/main/) level(s) under the generated dir
     # are the package-tree roots the import probe needs.
+    relative = generated_dir.relative_to(repo_path)
+    # The standard output path may be under a built-in ignore. An explicit
+    # exclusion anywhere above or within it still wins.
+    rescue = frozenset({f"/{relative.as_posix()}/**"})
+    if not is_walked_dir(relative.parts, exclude_paths, rescue):
+        return []
+    if (
+        any(
+            is_symlink_entry(path)
+            for path in (generated_dir, *generated_dir.parents)
+            if path.is_relative_to(repo_path) and path != repo_path
+        )
+        or not generated_dir.is_dir()
+    ):
+        return []
     roots = [generated_dir]
     for _ in range(depth):
         roots = [
             child
             for parent in roots
             for child in sorted(parent.iterdir())
-            if child.is_dir()
+            if is_walked_dir(child.relative_to(repo_path).parts, exclude_paths, rescue)
+            and not is_symlink_entry(child)
+            and child.is_dir()
         ]
     return roots
 
 
-def discover_generated_source_roots(repo_path: Path) -> list[tuple[str, ...]]:
-    """Repo-relative package-tree roots of on-disk generated sources, as path
-    part tuples ordered deterministically; empty when none exist."""
+def discover_generated_source_roots(
+    repo_path: Path,
+    exclude_paths: frozenset[str] | None = None,
+    unignore_paths: frozenset[str] | None = None,
+) -> list[tuple[str, ...]]:
+    """Find on-disk Java generated-source roots as sorted relative path parts."""
     repo_path = repo_path.resolve()
     roots: list[tuple[str, ...]] = []
-    for build_dir in _build_dirs(repo_path):
-        maven = build_dir.joinpath(*_MAVEN_GENERATED)
-        if maven.is_dir():
+    for build_dir in _build_dirs(repo_path, exclude_paths, unignore_paths):
+        for output, depth in ((_MAVEN_GENERATED, 1), (_GRADLE_GENERATED, 2)):
             roots.extend(
-                tuple(root.relative_to(repo_path).parts)
-                for root in _package_roots(maven, 1)
-            )
-        gradle = build_dir.joinpath(*_GRADLE_GENERATED)
-        if gradle.is_dir():
-            roots.extend(
-                tuple(root.relative_to(repo_path).parts)
-                for root in _package_roots(gradle, 2)
+                root.relative_to(repo_path).parts
+                for root in _package_roots(
+                    repo_path, build_dir.joinpath(*output), depth, exclude_paths
+                )
             )
     return sorted(set(roots))
 

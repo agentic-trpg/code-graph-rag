@@ -29,6 +29,64 @@ _EXPANDED = (
 )
 
 
+def test_excluded_lombok_manifest_cannot_trigger_overlay(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repo = tmp_path / "proj"
+    _write_repo(repo)
+    (repo / "pom.xml").write_text("<project/>", encoding="utf-8")
+    (repo / "build.gradle").write_text("lombok", encoding="utf-8")
+    _fake_java(monkeypatch)
+    monkeypatch.setattr(java_lombok, "find_lombok_jar", lambda: Path("fake.jar"))
+    calls: list[Path] = []
+    monkeypatch.setattr(
+        java_lombok,
+        "_run_delombok",
+        lambda _java, _jar, root, _out: calls.append(root) or True,
+    )
+
+    assert java_lombok.build_delombok_overlay(repo, frozenset({"build.gradle"})) == {}
+    assert calls == []
+    assert java_lombok.build_delombok_overlay(repo) == {}
+    assert calls == [repo / "src/main/java"]
+
+
+def test_excluded_or_linked_source_root_never_reaches_delombok(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repo = tmp_path / "proj"
+    _write_repo(repo)
+    _fake_java(monkeypatch)
+    monkeypatch.setattr(java_lombok, "find_lombok_jar", lambda: Path("fake.jar"))
+    calls: list[Path] = []
+    monkeypatch.setattr(
+        java_lombok,
+        "_run_delombok",
+        lambda _java, _jar, root, _out: calls.append(root) or True,
+    )
+    assert java_lombok.build_delombok_overlay(repo, frozenset({"src/main/java/"})) == {}
+    assert calls == []
+
+    linked = tmp_path / "linked"
+    linked.mkdir()
+    (linked / "pom.xml").write_text("lombok", encoding="utf-8")
+    try:
+        (repo / "build.gradle").symlink_to(linked / "pom.xml")
+    except (OSError, NotImplementedError):
+        pytest.skip("symlinks unavailable")
+    (repo / "pom.xml").write_text("<project/>", encoding="utf-8")
+    assert java_lombok.build_delombok_overlay(repo) == {}
+    assert calls == []
+    (repo / "pom.xml").write_text("lombok", encoding="utf-8")
+    (repo / "src/main/java/com/app/Widget.java").unlink()
+    (repo / "src/main/java/com/app").rmdir()
+    (repo / "src/main/java/com").rmdir()
+    (repo / "src/main/java").rmdir()
+    (repo / "src/main/java").symlink_to(linked, target_is_directory=True)
+    assert java_lombok.build_delombok_overlay(repo) == {}
+    assert calls == []
+
+
 def _write_repo(repo: Path) -> None:
     (repo / "src/main/java/com/app").mkdir(parents=True)
     (repo / "pom.xml").write_text(

@@ -25,6 +25,7 @@ from loguru import logger
 from .. import constants as cs
 from .. import logs as ls
 from ..config import settings
+from ..utils.path_utils import is_symlink_entry, is_walked_dir, should_skip_rel_file
 from .java_generated import _build_dirs
 
 _LOMBOK_MARKER = "lombok"
@@ -58,9 +59,21 @@ def lombok_jar_version(jar: Path) -> str:
     return match.group(1) if match else jar.name
 
 
-def _lombok_used(build_dir: Path) -> bool:
+def _lombok_used(
+    repo_path: Path,
+    build_dir: Path,
+    exclude_paths: frozenset[str] | None,
+    unignore_paths: frozenset[str] | None,
+) -> bool:
+    """Read Lombok markers only from build manifests eligible for the repo walk."""
+    parts = build_dir.relative_to(repo_path).parts
     for name in ("pom.xml", "build.gradle", "build.gradle.kts"):
         build_file = build_dir / name
+        rel = build_file.relative_to(repo_path).as_posix()
+        if should_skip_rel_file(
+            rel, parts, exclude_paths, unignore_paths
+        ) or is_symlink_entry(build_file):
+            continue
         try:
             if build_file.is_file() and _LOMBOK_MARKER in build_file.read_text(
                 encoding=cs.ENCODING_UTF8, errors="replace"
@@ -120,7 +133,11 @@ def _overlay_from_root(
     return overlay
 
 
-def build_delombok_overlay(repo_path: Path) -> dict[str, bytes]:
+def build_delombok_overlay(
+    repo_path: Path,
+    exclude_paths: frozenset[str] | None = None,
+    unignore_paths: frozenset[str] | None = None,
+) -> dict[str, bytes]:
     """Repo-relative path -> delomboked bytes for every Lombok-affected file;
     empty (raw parsing everywhere) unless Lombok, its jar, and java all line up."""
     repo_path = repo_path.resolve()
@@ -131,12 +148,20 @@ def build_delombok_overlay(repo_path: Path) -> dict[str, bytes]:
     if jar is None:
         return {}
     overlay: dict[str, bytes] = {}
-    for build_dir in _build_dirs(repo_path):
-        if not _lombok_used(build_dir):
+    for build_dir in _build_dirs(repo_path, exclude_paths, unignore_paths):
+        if not _lombok_used(repo_path, build_dir, exclude_paths, unignore_paths):
             continue
         for root_parts in cs.JAVA_MAVEN_SOURCE_ROOTS:
             source_root = build_dir.joinpath(*root_parts)
-            if not source_root.is_dir():
+            rel_parts = source_root.relative_to(repo_path).parts
+            if (
+                not is_walked_dir(rel_parts, exclude_paths, unignore_paths)
+                or any(
+                    is_symlink_entry(repo_path.joinpath(*rel_parts[:end]))
+                    for end in range(1, len(rel_parts) + 1)
+                )
+                or not source_root.is_dir()
+            ):
                 continue
             with tempfile.TemporaryDirectory(prefix="cgr-delombok-") as scratch:
                 if _run_delombok(java, jar, source_root, Path(scratch)):

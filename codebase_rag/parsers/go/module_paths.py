@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 from loguru import logger
 
 from ... import constants as cs
 from ... import logs as ls
+from ...utils.path_utils import is_symlink_entry, should_skip_rel_file, walk_repo_dirs
 
 
 def _module_directive(gomod: Path) -> str | None:
@@ -24,7 +24,12 @@ def _module_directive(gomod: Path) -> str | None:
     return None
 
 
-def discover_go_module_paths(repo_path: Path) -> list[tuple[str, str, Path]]:
+def discover_go_module_paths(
+    repo_path: Path,
+    exclude_paths: frozenset[str] | None = None,
+    unignore_paths: frozenset[str] | None = None,
+) -> list[tuple[str, str, Path]]:
+    """Map eligible go.mod directives to their repository module anchors."""
     # Go import paths are module-path-prefixed (github.com/acme/tool/pkg), so no
     # local import matches a repo-relative qn directly. Map every go.mod module
     # directive (root module plus nested workspace submodules) to the dotted
@@ -33,16 +38,18 @@ def discover_go_module_paths(repo_path: Path) -> list[tuple[str, str, Path]]:
     # module path first so a nested module shadows an enclosing one on shared
     # prefixes.
     mappings: list[tuple[str, str, Path]] = []
-    for gomod in repo_path.rglob(cs.DEP_FILE_GOMOD):
-        rel_dir = gomod.parent.relative_to(repo_path)
-        if any(part in cs.IGNORE_PATTERNS for part in rel_dir.parts):
+    for directory, parts, _, prefix, filenames in walk_repo_dirs(
+        repo_path, exclude_paths, unignore_paths
+    ):
+        if cs.DEP_FILE_GOMOD not in filenames or should_skip_rel_file(
+            f"{prefix}{cs.DEP_FILE_GOMOD}", parts, exclude_paths, unignore_paths
+        ):
+            continue
+        gomod = Path(directory) / cs.DEP_FILE_GOMOD
+        if is_symlink_entry(gomod):
             continue
         if module_path := _module_directive(gomod):
-            dotted = (
-                ""
-                if rel_dir == Path()
-                else str(rel_dir).replace(os.sep, cs.SEPARATOR_DOT)
-            )
+            dotted = cs.SEPARATOR_DOT.join(parts)
             mappings.append((module_path, dotted, gomod.parent))
             logger.debug(ls.IMP_GO_MODULE_PATH, module=module_path, path=dotted)
     # Deterministic order: longest module path first, then lexicographic, so

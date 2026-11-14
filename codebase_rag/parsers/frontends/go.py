@@ -57,21 +57,35 @@ class GoFrontend:
     def available(self) -> bool:
         return go_frontend_available()
 
-    def applies(self, repo_path: Path) -> bool:
-        return find_go_module(repo_path) is not None
+    def applies(
+        self,
+        repo_path: Path,
+        *,
+        exclude_paths: frozenset[str] | None = None,
+        unignore_paths: frozenset[str] | None = None,
+    ) -> bool:
+        """Check whether the repository scope holds an eligible Go module."""
+        return find_go_module(repo_path, exclude_paths, unignore_paths) is not None
 
     def run(
         self,
         repo_path: Path,
         files: Sequence[Path],
         rescued_files: frozenset[str] = frozenset(),
+        *,
+        exclude_paths: frozenset[str] | None = None,
+        unignore_paths: frozenset[str] | None = None,
     ) -> SemanticFacts:
+        """Collect project-wide facts for eligible Go module roots."""
         # The frontend loads the whole project in one run: a narrowed file
         # list cannot bind calls whose targets live in the files it omits.
         del files
         return _adapt_go_semantic_facts(
             run_go_frontend(
-                repo_path, ignored_dirs=frontend_ignored_dirs(rescued_files)
+                repo_path,
+                ignored_dirs=frontend_ignored_dirs(rescued_files),
+                exclude_paths=exclude_paths,
+                unignore_paths=unignore_paths,
             )
         )
 

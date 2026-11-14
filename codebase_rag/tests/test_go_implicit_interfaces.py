@@ -567,7 +567,7 @@ def _gotypes(
         compared_types=_compared("shapes.go", SHAPES),
     )
     monkeypatch.setattr(go_fe, "go_frontend_available", lambda: True)
-    monkeypatch.setattr(go_fe, "run_go_frontend", lambda repo_path, ignored_dirs: facts)
+    monkeypatch.setattr(go_fe, "run_go_frontend", lambda repo_path, **kwargs: facts)
 
 
 def _index_with_gotypes(
@@ -1083,7 +1083,7 @@ def _gotypes_facts(monkeypatch: pytest.MonkeyPatch, facts: GoSemanticFacts) -> N
 
     monkeypatch.setattr(gu.settings, "GO_FRONTEND", cs.GoFrontend.GOTYPES)
     monkeypatch.setattr(go_fe, "go_frontend_available", lambda: True)
-    monkeypatch.setattr(go_fe, "run_go_frontend", lambda repo_path, ignored_dirs: facts)
+    monkeypatch.setattr(go_fe, "run_go_frontend", lambda repo_path, **kwargs: facts)
 
 
 def test_a_go_types_run_that_proves_no_pair_adds_no_name_match(
@@ -1598,7 +1598,7 @@ def test_a_pair_that_changes_source_stays_an_implementer(
     monkeypatch.setattr(gu.settings, "GO_FRONTEND", cs.GoFrontend.GOTYPES)
     monkeypatch.setattr(go_fe, "go_frontend_available", lambda: True)
     monkeypatch.setattr(
-        go_fe, "run_go_frontend", lambda repo_path, ignored_dirs: current["facts"]
+        go_fe, "run_go_frontend", lambda repo_path, **kwargs: current["facts"]
     )
 
     def repo(path: Path) -> Path:

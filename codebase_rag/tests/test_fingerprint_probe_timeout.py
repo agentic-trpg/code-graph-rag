@@ -129,7 +129,7 @@ def go_probe(monkeypatch: pytest.MonkeyPatch, go_binary: Path) -> ScriptedRun:
             SubprocessError=subprocess.SubprocessError,
         ),
     )
-    monkeypatch.setattr(pf, "_active_tools", lambda repo_path=None: _ONLY_GO_ACTIVE)
+    monkeypatch.setattr(pf, "_active_tools", lambda *_args: _ONLY_GO_ACTIVE)
     return scripted
 
 
@@ -461,7 +461,7 @@ class TestRealChangesStillChangeTheFingerprint:
         # off must still read `inactive`, not a remembered version.
         pf._tool_versions(repo, state)
         none_active = dict.fromkeys(_ONLY_GO_ACTIVE, False)
-        monkeypatch.setattr(pf, "_active_tools", lambda repo_path=None: none_active)
+        monkeypatch.setattr(pf, "_active_tools", lambda *_args: none_active)
         go_probe.script(TIMED_OUT)
 
         versions = pf._tool_versions(repo, state)

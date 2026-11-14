@@ -270,7 +270,11 @@ def _write_state_map(
         return
 
 
-def _active_tools(repo_path: Path | None = None) -> dict[str, bool]:
+def _active_tools(
+    repo_path: Path | None = None,
+    exclude_paths: frozenset[str] | None = None,
+    unignore_paths: frozenset[str] | None = None,
+) -> dict[str, bool]:
     """Whether each tool can participate in extraction for THIS repository.
 
     Two gates, and both are needed. The resolved frontend mode says the
@@ -323,7 +327,9 @@ def _active_tools(repo_path: Path | None = None) -> dict[str, bool]:
     return {
         "GO_VERSION": (
             resolve_go_frontend() is not cs.GoFrontend.TREESITTER
-            and _in_repo(find_go_module)
+            and _in_repo(
+                lambda repo: find_go_module(repo, exclude_paths, unignore_paths)
+            )
         ),
         "JAVAC_VERSION": resolve_java_frontend() is not cs.JavaFrontend.HEURISTIC,
         "DOTNET_VERSION": (
@@ -334,7 +340,10 @@ def _active_tools(repo_path: Path | None = None) -> dict[str, bool]:
 
 
 def _tool_versions(
-    repo_path: Path | None = None, state_dir: Path | None = None
+    repo_path: Path | None = None,
+    state_dir: Path | None = None,
+    exclude_paths: frozenset[str] | None = None,
+    unignore_paths: frozenset[str] | None = None,
 ) -> list[str]:
     """`KEY=version` for each ACTIVE external toolchain, in a stable order.
 
@@ -356,7 +365,7 @@ def _tool_versions(
     the old stamp, and the next sync that gets an answer compares it with
     that stamp. With nothing recorded, `unknown` is hashed as itself.
     """
-    active = _active_tools(repo_path)
+    active = _active_tools(repo_path, exclude_paths, unignore_paths)
     hashed = _read_state_map(state_dir, cs.TOOL_VERSIONS_HASHED_FILENAME)
     values: dict[str, str] = {}
     for key, executable, argument in _VERSIONED_TOOLS:
@@ -378,12 +387,16 @@ def compute_parser_fingerprint(
     repo_path: Path | None = None,
     capture: "CaptureSelection | None" = None,
     state_dir: Path | None = None,
+    *,
+    exclude_paths: frozenset[str] | None = None,
+    unignore_paths: frozenset[str] | None = None,
 ) -> str:
     """The parser identity a graph is stamped with, as one hex digest.
 
     `state_dir` is the checkout's state directory: given one, toolchain
     answers are reused across processes when a version probe times out (see
     `_probe_version` and `_tool_versions`). Without it they last the process.
+    The checkout's configured ignore rules scope the Go module probe.
     """
     root = package_root if package_root is not None else Path(__file__).resolve().parent
     hasher = hashlib.md5(usedforsecurity=False)
@@ -404,7 +417,7 @@ def compute_parser_fingerprint(
     # compiler upgrade changes the emitted edges with the mode unchanged, so
     # without this an incremental run reuses a graph the older tool produced
     # (issue #1465).
-    for entry in _tool_versions(repo_path, state_dir):
+    for entry in _tool_versions(repo_path, state_dir, exclude_paths, unignore_paths):
         hasher.update(entry.encode())
     # The capture selection decides which edges exist for unchanged sources,
     # the same criterion the frontend mode above is hashed under: enabling a

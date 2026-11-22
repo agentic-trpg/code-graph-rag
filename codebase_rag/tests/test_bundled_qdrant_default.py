@@ -687,7 +687,7 @@ def test_without_the_stack_the_cache_stays_beside_the_embedded_store(
     _leave_db_path_unset(monkeypatch)
 
     assert _cache_path() == Path(cs.QDRANT_DEFAULT_DB_PATH) / (
-        cs.EMBEDDING_CACHE_FILENAME
+        cs.KEYED_EMBEDDING_CACHE_FILENAME
     )
 
 

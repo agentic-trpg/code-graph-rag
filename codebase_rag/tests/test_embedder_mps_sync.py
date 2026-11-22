@@ -45,18 +45,18 @@ def mock_unixcoder() -> MagicMock:
 
 @pytest.fixture(autouse=True)
 def reset_batch_counter(monkeypatch: pytest.MonkeyPatch) -> None:
-    from codebase_rag import embedder
+    from codebase_rag import unixcoder_runtime
 
-    monkeypatch.setattr(embedder, "_batches_since_cache_drop", 0)
+    monkeypatch.setattr(unixcoder_runtime, "_batches_since_cache_drop", 0)
 
 
 class TestSyncAfterBatch:
     def test_mps_device_synchronizes_every_batch(self) -> None:
-        from codebase_rag.embedder import _sync_after_batch
+        from codebase_rag.unixcoder_runtime import _sync_after_batch
 
         with (
-            patch("codebase_rag.embedder.torch.mps.synchronize") as mock_sync,
-            patch("codebase_rag.embedder.torch.mps.empty_cache") as mock_empty,
+            patch("codebase_rag.unixcoder_runtime.torch.mps.synchronize") as mock_sync,
+            patch("codebase_rag.unixcoder_runtime.torch.mps.empty_cache") as mock_empty,
         ):
             _sync_after_batch(cs.EmbeddingDevice.MPS)
 
@@ -64,11 +64,11 @@ class TestSyncAfterBatch:
         mock_empty.assert_not_called()
 
     def test_cache_dropped_once_per_interval(self) -> None:
-        from codebase_rag.embedder import _sync_after_batch
+        from codebase_rag.unixcoder_runtime import _sync_after_batch
 
         with (
-            patch("codebase_rag.embedder.torch.mps.synchronize") as mock_sync,
-            patch("codebase_rag.embedder.torch.mps.empty_cache") as mock_empty,
+            patch("codebase_rag.unixcoder_runtime.torch.mps.synchronize") as mock_sync,
+            patch("codebase_rag.unixcoder_runtime.torch.mps.empty_cache") as mock_empty,
         ):
             for _ in range(cs.EMBEDDING_MPS_CACHE_DROP_INTERVAL + 1):
                 _sync_after_batch(cs.EmbeddingDevice.MPS)
@@ -77,11 +77,11 @@ class TestSyncAfterBatch:
         mock_empty.assert_called_once()
 
     def test_counter_resets_after_drop(self) -> None:
-        from codebase_rag.embedder import _sync_after_batch
+        from codebase_rag.unixcoder_runtime import _sync_after_batch
 
         with (
-            patch("codebase_rag.embedder.torch.mps.synchronize"),
-            patch("codebase_rag.embedder.torch.mps.empty_cache") as mock_empty,
+            patch("codebase_rag.unixcoder_runtime.torch.mps.synchronize"),
+            patch("codebase_rag.unixcoder_runtime.torch.mps.empty_cache") as mock_empty,
         ):
             for _ in range(2 * cs.EMBEDDING_MPS_CACHE_DROP_INTERVAL):
                 _sync_after_batch(cs.EmbeddingDevice.MPS)
@@ -92,11 +92,11 @@ class TestSyncAfterBatch:
         "device", [cs.EmbeddingDevice.CPU, cs.EmbeddingDevice.CUDA]
     )
     def test_other_devices_do_nothing(self, device: cs.EmbeddingDevice) -> None:
-        from codebase_rag.embedder import _sync_after_batch
+        from codebase_rag.unixcoder_runtime import _sync_after_batch
 
         with (
-            patch("codebase_rag.embedder.torch.mps.synchronize") as mock_sync,
-            patch("codebase_rag.embedder.torch.mps.empty_cache") as mock_empty,
+            patch("codebase_rag.unixcoder_runtime.torch.mps.synchronize") as mock_sync,
+            patch("codebase_rag.unixcoder_runtime.torch.mps.empty_cache") as mock_empty,
         ):
             # A full interval of non-MPS batches must not advance the
             # cache-drop counter either.
@@ -109,11 +109,11 @@ class TestSyncAfterBatch:
     def test_accepts_torch_device_objects(self) -> None:
         import torch
 
-        from codebase_rag.embedder import _sync_after_batch
+        from codebase_rag.unixcoder_runtime import _sync_after_batch
 
         with (
-            patch("codebase_rag.embedder.torch.mps.synchronize") as mock_sync,
-            patch("codebase_rag.embedder.torch.mps.empty_cache"),
+            patch("codebase_rag.unixcoder_runtime.torch.mps.synchronize") as mock_sync,
+            patch("codebase_rag.unixcoder_runtime.torch.mps.empty_cache"),
         ):
             _sync_after_batch(torch.device(cs.EmbeddingDevice.MPS))
 
@@ -138,8 +138,10 @@ class TestEmbedCallsSync:
         )
 
         with (
-            patch("codebase_rag.embedder.get_model", return_value=mock_unixcoder),
-            patch("codebase_rag.embedder._sync_after_batch") as mock_sync,
+            patch(
+                "codebase_rag.unixcoder_runtime.get_model", return_value=mock_unixcoder
+            ),
+            patch("codebase_rag.unixcoder_runtime._sync_after_batch") as mock_sync,
         ):
             embed_code_batch(snippets, batch_size=2)
 
@@ -154,8 +156,10 @@ class TestEmbedCallsSync:
         mock_unixcoder.return_value = (torch.zeros(1, 5, 768), torch.zeros(1, 768))
 
         with (
-            patch("codebase_rag.embedder.get_model", return_value=mock_unixcoder),
-            patch("codebase_rag.embedder._sync_after_batch") as mock_sync,
+            patch(
+                "codebase_rag.unixcoder_runtime.get_model", return_value=mock_unixcoder
+            ),
+            patch("codebase_rag.unixcoder_runtime._sync_after_batch") as mock_sync,
         ):
             embed_code("def hello(): pass")
 
@@ -180,29 +184,31 @@ class TestModelLoadDrain:
         moved: bool,
         drained: bool,
     ) -> None:
-        from codebase_rag import embedder
+        from codebase_rag import unixcoder_runtime
 
         events: list[str] = []
         mock_unixcoder.to.side_effect = lambda _device: (
             events.append("to") or mock_unixcoder
         )
 
-        embedder.get_model.cache_clear()
+        unixcoder_runtime.get_model.cache_clear()
         with (
-            patch("codebase_rag.embedder.UniXcoder", return_value=mock_unixcoder),
-            patch("codebase_rag.embedder._select_device", return_value=device),
             patch(
-                "codebase_rag.embedder.torch.mps.synchronize",
+                "codebase_rag.unixcoder_runtime.UniXcoder", return_value=mock_unixcoder
+            ),
+            patch("codebase_rag.unixcoder_runtime._select_device", return_value=device),
+            patch(
+                "codebase_rag.unixcoder_runtime.torch.mps.synchronize",
                 side_effect=lambda: events.append("sync"),
             ),
-            patch("codebase_rag.embedder.torch.mps.empty_cache") as mock_empty,
+            patch("codebase_rag.unixcoder_runtime.torch.mps.empty_cache") as mock_empty,
         ):
-            assert embedder.get_model() is mock_unixcoder
+            assert unixcoder_runtime.get_model() is mock_unixcoder
 
         expected = (["to"] if moved else []) + (["sync"] if drained else [])
         assert events == expected
         mock_empty.assert_not_called()
         # The load drain is not a batch: it must not advance the cache-drop
         # interval that `_sync_after_batch` counts.
-        assert embedder._batches_since_cache_drop == 0
-        embedder.get_model.cache_clear()
+        assert unixcoder_runtime._batches_since_cache_drop == 0
+        unixcoder_runtime.get_model.cache_clear()

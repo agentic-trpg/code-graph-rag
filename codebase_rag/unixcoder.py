@@ -12,13 +12,20 @@ from . import constants as cs
 
 
 class UniXcoder(nn.Module):
-    def __init__(self, model_name: str) -> None:
+    def __init__(self, model_name: str, *, revision: str | None = None) -> None:
+        """Load the tokenizer, configuration, and weights from one model revision."""
         super().__init__()
-        self.tokenizer: RobertaTokenizer = RobertaTokenizer.from_pretrained(model_name)
-        self.config: RobertaConfig = RobertaConfig.from_pretrained(model_name)
+        if revision is None:
+            revision = "main"
+        self.tokenizer: RobertaTokenizer = RobertaTokenizer.from_pretrained(
+            model_name, revision=revision
+        )
+        self.config: RobertaConfig = RobertaConfig.from_pretrained(
+            model_name, revision=revision
+        )
         self.config.is_decoder = True
         self.model: RobertaModel = RobertaModel.from_pretrained(
-            model_name, config=self.config
+            model_name, config=self.config, revision=revision
         )
 
         self.register_buffer(

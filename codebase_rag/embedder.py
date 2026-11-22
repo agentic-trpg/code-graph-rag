@@ -3,8 +3,8 @@ from __future__ import annotations
 import hashlib
 import json
 import os
-from functools import lru_cache
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import httpx
 from loguru import logger
@@ -13,10 +13,24 @@ from . import constants as cs
 from . import exceptions as ex
 from . import logs as ls
 from .config import API_KEY_INFO, normalised_credential, settings
+from .embedding_cache import KeyedEmbeddingCache
+from .embedding_identity import (
+    effective_max_length,
+    embedding_namespace,
+    legacy_embedding_revision,
+)
 from .utils.dependencies import has_torch, has_transformers
 
+if TYPE_CHECKING:
+    from . import unixcoder_runtime
 
-def _cache_namespace() -> str:
+    get_model = unixcoder_runtime.get_model
+
+
+_LEGACY_UNIXCODER_MAX_LENGTH = 512
+
+
+def _legacy_cache_namespace() -> str:
     # Embeddings from different providers/models live in different vector
     # spaces; namespacing cache keys prevents a provider or model switch
     # from replaying stale vectors of the wrong space.
@@ -29,6 +43,8 @@ def _cache_namespace() -> str:
 
 
 class EmbeddingCache:
+    """Keep the standalone JSON cache API for callers with an explicit path."""
+
     __slots__ = ("_cache", "_path")
 
     def __init__(self, path: Path | None = None) -> None:
@@ -37,7 +53,9 @@ class EmbeddingCache:
 
     @staticmethod
     def _content_hash(content: str) -> str:
-        return hashlib.sha256(f"{_cache_namespace()}\x00{content}".encode()).hexdigest()
+        return hashlib.sha256(
+            f"{_legacy_cache_namespace()}\x00{content}".encode()
+        ).hexdigest()
 
     def get(self, content: str) -> list[float] | None:
         return self._cache.get(self._content_hash(content))
@@ -86,24 +104,105 @@ class EmbeddingCache:
         return len(self._cache)
 
 
-_embedding_cache: EmbeddingCache | None = None
+class _SnippetEmbeddingCache:
+    """Map snippets into the configured embedding space before keyed storage."""
+
+    def __init__(
+        self, path: Path, legacy_path: Path | None, legacy_revision: str | None
+    ) -> None:
+        """Keep the cache location and open the keyed store on demand."""
+        self._path = path
+        self._store = KeyedEmbeddingCache(
+            path, legacy_path, legacy_revision=legacy_revision
+        )
+
+    @staticmethod
+    def _keys(snippets: list[str], max_length: int | None) -> list[str]:
+        """Hash snippets under the current embedding namespace."""
+        namespace = embedding_namespace(max_length)
+        return [
+            hashlib.sha256(f"{namespace}\x00{snippet}".encode()).hexdigest()
+            for snippet in snippets
+        ]
+
+    def get(self, content: str, max_length: int | None = None) -> list[float] | None:
+        """Return the vector cached for this snippet and embedding configuration."""
+        return self.get_many([content], max_length).get(0)
+
+    def put(
+        self, content: str, embedding: list[float], max_length: int | None = None
+    ) -> None:
+        """Queue a vector for persistence under the active namespace."""
+        self.put_many([content], [embedding], max_length)
+
+    def get_many(
+        self, snippets: list[str], max_length: int | None = None
+    ) -> dict[int, list[float]]:
+        """Read only requested keys and promote eligible legacy hits."""
+        keys = self._keys(snippets, max_length)
+        hits = self._store.get_many(keys)
+        if (
+            len(hits) == len(keys)
+            or effective_max_length(max_length) != _LEGACY_UNIXCODER_MAX_LENGTH
+            or (revision := legacy_embedding_revision()) is None
+            or not self._store.legacy_matches(revision)
+        ):
+            return hits
+        missing = [index for index in range(len(keys)) if index not in hits]
+        aliases = [EmbeddingCache._content_hash(snippets[index]) for index in missing]
+        for alias_index, embedding in self._store.get_many(aliases).items():
+            index = missing[alias_index]
+            hits[index] = embedding
+            self._store.put(keys[index], embedding)
+        return hits
+
+    def put_many(
+        self,
+        snippets: list[str],
+        embeddings: list[list[float]],
+        max_length: int | None = None,
+    ) -> None:
+        """Queue vectors in snippet order under the active namespace."""
+        self._store.put_many(self._keys(snippets, max_length), embeddings)
+
+    def save(self) -> None:
+        """Persist queued vectors."""
+        self._store.save()
+
+    def close(self) -> None:
+        """Discard pending vectors and release the underlying connection."""
+        self._store.clear()
+        self._store.close()
 
 
-def get_embedding_cache() -> EmbeddingCache:
+_embedding_cache: _SnippetEmbeddingCache | None = None
+
+
+def get_embedding_cache() -> _SnippetEmbeddingCache:
+    """Return the shared snippet cache for the active vector-store directory."""
     global _embedding_cache
     if _embedding_cache is None:
         from .vector_store import embedding_cache_dir
 
-        cache_path = embedding_cache_dir() / cs.EMBEDDING_CACHE_FILENAME
-        _embedding_cache = EmbeddingCache(path=cache_path)
-        _embedding_cache.load()
+        directory = embedding_cache_dir()
+        cache_path = directory / cs.KEYED_EMBEDDING_CACHE_FILENAME
+        legacy_revision = legacy_embedding_revision()
+        legacy_path = (
+            directory / cs.EMBEDDING_CACHE_FILENAME
+            if legacy_revision is not None
+            else None
+        )
+        _embedding_cache = _SnippetEmbeddingCache(
+            cache_path, legacy_path, legacy_revision
+        )
     return _embedding_cache
 
 
 def clear_embedding_cache() -> None:
+    """Drop the process cache reference and release its connection."""
     global _embedding_cache
     if _embedding_cache is not None:
-        _embedding_cache.clear()
+        _embedding_cache.close()
         _embedding_cache = None
 
 
@@ -182,115 +281,53 @@ def _parse_embedding_rows(response: httpx.Response, expected: int) -> list[list[
     return [row for row in placed if row is not None]
 
 
-if has_torch() and has_transformers():
-    import numpy as np
-    import torch
-    from numpy.typing import NDArray
+def __getattr__(name: str) -> object:
+    """Expose the existing get_model entry point and its cache controls lazily."""
+    if name == "get_model":
+        from .unixcoder_runtime import get_model
 
-    from .unixcoder import UniXcoder
+        return get_model
+    raise AttributeError(name)
 
-    def _device_available(device: cs.EmbeddingDevice) -> bool:
-        match device:
-            case cs.EmbeddingDevice.CUDA:
-                return torch.cuda.is_available()
-            case cs.EmbeddingDevice.MPS:
-                return torch.backends.mps.is_available()
-            case _:
-                return True
 
-    def _select_device() -> cs.EmbeddingDevice:
-        if (override := settings.EMBEDDING_DEVICE) is not None:
-            if _device_available(override):
-                return override
-            logger.warning(ls.EMBEDDING_DEVICE_UNAVAILABLE.format(device=override))
-        if torch.cuda.is_available():
-            return cs.EmbeddingDevice.CUDA
-        if torch.backends.mps.is_available():
-            return cs.EmbeddingDevice.MPS
-        return cs.EmbeddingDevice.CPU
-
-    _batches_since_cache_drop = 0
-
-    def _sync_after_batch(device: torch.device | str) -> None:
-        # MPS wedges inside Metal's waitUntilCompleted when command buffers
-        # accumulate across thousands of batches (issue #689); draining the
-        # stream after every batch keeps each command buffer short-lived,
-        # and a periodic (not per-batch: ~21% throughput cost) cache drop
-        # bounds Metal allocator growth over monorepo-scale runs.
-        if torch.device(device).type != cs.EmbeddingDevice.MPS:
-            return
-        torch.mps.synchronize()
-        global _batches_since_cache_drop
-        _batches_since_cache_drop += 1
-        if _batches_since_cache_drop >= cs.EMBEDDING_MPS_CACHE_DROP_INTERVAL:
-            torch.mps.empty_cache()
-            _batches_since_cache_drop = 0
-
-    @lru_cache(maxsize=1)
-    def get_model() -> UniXcoder:
-        model = UniXcoder(cs.UNIXCODER_MODEL)
-        model.eval()
-        device = _select_device()
-        if device != cs.EmbeddingDevice.CPU:
-            model = model.to(device)
-        if device == cs.EmbeddingDevice.MPS:
-            # The weight upload is the first copy on the MPS stream, before
-            # any batch and so before `_sync_after_batch` ever runs. Draining
-            # it here keeps a copy that parks on the stream from surfacing
-            # later inside the first batch's transfers, and pins a wedge at
-            # load to this one point ahead of any store write (issue #2218).
-            torch.mps.synchronize()
-        return model
-
-    def _unixcoder_embed_code(code: str, max_length: int | None) -> list[float]:
-        if max_length is None:
-            max_length = settings.EMBEDDING_MAX_LENGTH
-        model = get_model()
-        device = next(model.parameters()).device
-        tokens = model.tokenize([code], max_length=max_length)
-        tokens_tensor = torch.tensor(tokens).to(device)
-        with torch.no_grad():
-            _, sentence_embeddings = model(tokens_tensor)
-            embedding: NDArray[np.float32] = sentence_embeddings.cpu().numpy()
-        _sync_after_batch(device)
-        result: list[float] = embedding[0].tolist()
-        return result
-
-    def _unixcoder_embed_batch(
-        snippets: list[str], max_length: int | None, batch_size: int
-    ) -> list[list[float]]:
-        if max_length is None:
-            max_length = settings.EMBEDDING_MAX_LENGTH
-        model = get_model()
-        device = next(model.parameters()).device
-
-        all_new_embeddings: list[list[float]] = []
-        for start in range(0, len(snippets), batch_size):
-            batch = snippets[start : start + batch_size]
-            tokens_list = model.tokenize(batch, max_length=max_length, padding=True)
-            tokens_tensor = torch.tensor(tokens_list).to(device)
-            with torch.no_grad():
-                _, sentence_embeddings = model(tokens_tensor)
-                batch_np: NDArray[np.float32] = sentence_embeddings.cpu().numpy()
-            _sync_after_batch(device)
-            for row in batch_np:
-                all_new_embeddings.append(row.tolist())
-        return all_new_embeddings
-
-else:
-
-    def _unixcoder_embed_code(code: str, max_length: int | None) -> list[float]:
+def _require_local_dependencies() -> None:
+    """Raise the existing semantic-extra error before importing the local runtime."""
+    if not (has_torch() and has_transformers()):
         raise RuntimeError(ex.SEMANTIC_EXTRA)
 
-    def _unixcoder_embed_batch(
-        snippets: list[str], max_length: int | None, batch_size: int
-    ) -> list[list[float]]:
-        raise RuntimeError(ex.SEMANTIC_EXTRA)
+
+def _unixcoder_embed_code(code: str, max_length: int | None) -> list[float]:
+    """Route a cache miss to the configured worker or local inference."""
+    if os.environ.get("CGR_UNIXCODER_WORKER_DIR"):
+        from . import embedding_worker
+
+        return embedding_worker.embed_code(code, effective_max_length(max_length))
+    _require_local_dependencies()
+    from . import unixcoder_runtime
+
+    return unixcoder_runtime._unixcoder_embed_code(code, max_length)
+
+
+def _unixcoder_embed_batch(
+    snippets: list[str], max_length: int | None, batch_size: int
+) -> list[list[float]]:
+    """Route uncached snippets to the configured worker or local inference."""
+    if os.environ.get("CGR_UNIXCODER_WORKER_DIR"):
+        from . import embedding_worker
+
+        return embedding_worker.embed_batch(
+            snippets, effective_max_length(max_length), batch_size
+        )
+    _require_local_dependencies()
+    from . import unixcoder_runtime
+
+    return unixcoder_runtime._unixcoder_embed_batch(snippets, max_length, batch_size)
 
 
 def embed_code(code: str, max_length: int | None = None) -> list[float]:
+    """Return one snippet vector and cache a successful provider call."""
     cache = get_embedding_cache()
-    if (cached := cache.get(code)) is not None:
+    if (cached := cache.get(code, max_length)) is not None:
         return cached
     try:
         if settings.EMBEDDING_PROVIDER == cs.EmbeddingProvider.OPENAI:
@@ -300,7 +337,7 @@ def embed_code(code: str, max_length: int | None = None) -> list[float]:
     except Exception:
         logger.exception(ls.EMBEDDING_SNIPPET_FAILED, length=len(code))
         raise
-    cache.put(code, result)
+    cache.put(code, result, max_length)
     return result
 
 
@@ -309,11 +346,12 @@ def embed_code_batch(
     max_length: int | None = None,
     batch_size: int = cs.EMBEDDING_DEFAULT_BATCH_SIZE,
 ) -> list[list[float]]:
+    """Return vectors in snippet order, embedding only cache misses."""
     if not snippets:
         return []
 
     cache = get_embedding_cache()
-    cached_results = cache.get_many(snippets)
+    cached_results = cache.get_many(snippets, max_length)
 
     if len(cached_results) == len(snippets):
         logger.debug(ls.EMBEDDING_CACHE_HIT, count=len(snippets))
@@ -329,7 +367,7 @@ def embed_code_batch(
             uncached_snippets, max_length, batch_size
         )
 
-    cache.put_many(uncached_snippets, all_new_embeddings)
+    cache.put_many(uncached_snippets, all_new_embeddings, max_length)
 
     results: list[list[float]] = [[] for _ in snippets]
     for i, emb in cached_results.items():

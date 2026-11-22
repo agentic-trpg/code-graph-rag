@@ -81,6 +81,7 @@ HTTP_OK = 200
 UNIXCODER_MODEL = "microsoft/unixcoder-base"
 EMBEDDING_DEFAULT_BATCH_SIZE = 64
 EMBEDDING_CACHE_FILENAME = ".embedding_cache.json"
+KEYED_EMBEDDING_CACHE_FILENAME = ".embedding_cache.sqlite3"
 
 OPENAI_EMBEDDING_DEFAULT_MODEL = "text-embedding-3-small"
 OPENAI_EMBEDDINGS_PATH = "/embeddings"

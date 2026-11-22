@@ -78,7 +78,7 @@ def test_embed_code_returns_768_dimensional_vector(
     mock_embedding = torch.zeros(1, 768)
     mock_unixcoder.return_value = (torch.zeros(1, 5, 768), mock_embedding)
 
-    with patch("codebase_rag.embedder.get_model", return_value=mock_unixcoder):
+    with patch("codebase_rag.unixcoder_runtime.get_model", return_value=mock_unixcoder):
         from codebase_rag.embedder import embed_code
 
         result = embed_code("def hello(): pass")
@@ -96,7 +96,7 @@ def test_embed_code_calls_tokenize(
     mock_embedding = torch.zeros(1, 768)
     mock_unixcoder.return_value = (torch.zeros(1, 5, 768), mock_embedding)
 
-    with patch("codebase_rag.embedder.get_model", return_value=mock_unixcoder):
+    with patch("codebase_rag.unixcoder_runtime.get_model", return_value=mock_unixcoder):
         from codebase_rag.embedder import embed_code
 
         embed_code("def test(): return 42", max_length=256)
@@ -115,7 +115,7 @@ def test_embed_code_uses_default_max_length(
     mock_embedding = torch.zeros(1, 768)
     mock_unixcoder.return_value = (torch.zeros(1, 5, 768), mock_embedding)
 
-    with patch("codebase_rag.embedder.get_model", return_value=mock_unixcoder):
+    with patch("codebase_rag.unixcoder_runtime.get_model", return_value=mock_unixcoder):
         from codebase_rag.embedder import embed_code
 
         embed_code("x = 1")
@@ -127,12 +127,14 @@ def test_embed_code_uses_default_max_length(
 def test_get_model_is_cached(reset_model_cache: None) -> None:
     from codebase_rag.embedder import get_model  # ty: ignore[possibly-missing-import]
 
-    with patch("codebase_rag.embedder.UniXcoder") as mock_unixcoder_class:
+    with patch("codebase_rag.unixcoder_runtime.UniXcoder") as mock_unixcoder_class:
         mock_instance = MagicMock()
         mock_instance.eval.return_value = mock_instance
         mock_unixcoder_class.return_value = mock_instance
 
-        with patch("codebase_rag.embedder.torch.cuda.is_available", return_value=False):
+        with patch(
+            "codebase_rag.unixcoder_runtime.torch.cuda.is_available", return_value=False
+        ):
             model1 = get_model()
             model2 = get_model()
 
@@ -141,16 +143,57 @@ def test_get_model_is_cached(reset_model_cache: None) -> None:
 
 
 @pytest.mark.skipif(not _has_semantic_deps(), reason="torch/transformers not installed")
+def test_get_model_uses_the_exact_configured_revision(
+    reset_model_cache: None, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from codebase_rag.embedder import get_model
+
+    revision = "a" * 40
+    monkeypatch.delenv("CGR_UNIXCODER_MODEL_PATH", raising=False)
+    monkeypatch.setenv("CGR_EMBEDDING_REVISION", revision)
+    with (
+        patch("codebase_rag.unixcoder_runtime.UniXcoder") as constructor,
+        patch(
+            "codebase_rag.unixcoder_runtime._select_device",
+            return_value=cs.EmbeddingDevice.CPU,
+        ),
+    ):
+        get_model()
+    constructor.assert_called_once_with(cs.UNIXCODER_MODEL, revision=revision)
+
+
+@pytest.mark.skipif(not _has_semantic_deps(), reason="torch/transformers not installed")
+def test_get_model_uses_the_configured_local_snapshot(
+    reset_model_cache: None, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from codebase_rag.embedder import get_model
+
+    monkeypatch.setenv("CGR_UNIXCODER_MODEL_PATH", str(tmp_path))
+    monkeypatch.setenv("CGR_EMBEDDING_REVISION", "a" * 40)
+    with (
+        patch("codebase_rag.unixcoder_runtime.UniXcoder") as constructor,
+        patch(
+            "codebase_rag.unixcoder_runtime._select_device",
+            return_value=cs.EmbeddingDevice.CPU,
+        ),
+    ):
+        get_model()
+    constructor.assert_called_once_with(str(tmp_path.resolve()))
+
+
+@pytest.mark.skipif(not _has_semantic_deps(), reason="torch/transformers not installed")
 def test_get_model_uses_cuda_when_available(reset_model_cache: None) -> None:
     from codebase_rag.embedder import get_model  # ty: ignore[possibly-missing-import]
 
-    with patch("codebase_rag.embedder.UniXcoder") as mock_unixcoder_class:
+    with patch("codebase_rag.unixcoder_runtime.UniXcoder") as mock_unixcoder_class:
         mock_instance = MagicMock()
         mock_instance.eval.return_value = mock_instance
         mock_instance.to.return_value = mock_instance
         mock_unixcoder_class.return_value = mock_instance
 
-        with patch("codebase_rag.embedder.torch.cuda.is_available", return_value=True):
+        with patch(
+            "codebase_rag.unixcoder_runtime.torch.cuda.is_available", return_value=True
+        ):
             get_model()
 
     mock_instance.to.assert_called_once_with(cs.EmbeddingDevice.CUDA)
@@ -160,12 +203,14 @@ def test_get_model_uses_cuda_when_available(reset_model_cache: None) -> None:
 def test_get_model_does_not_use_cuda_when_unavailable(reset_model_cache: None) -> None:
     from codebase_rag.embedder import get_model  # ty: ignore[possibly-missing-import]
 
-    with patch("codebase_rag.embedder.UniXcoder") as mock_unixcoder_class:
+    with patch("codebase_rag.unixcoder_runtime.UniXcoder") as mock_unixcoder_class:
         mock_instance = MagicMock()
         mock_instance.eval.return_value = mock_instance
         mock_unixcoder_class.return_value = mock_instance
 
-        with patch("codebase_rag.embedder.torch.cuda.is_available", return_value=False):
+        with patch(
+            "codebase_rag.unixcoder_runtime.torch.cuda.is_available", return_value=False
+        ):
             get_model()
 
     mock_instance.cuda.assert_not_called()
@@ -173,39 +218,48 @@ def test_get_model_does_not_use_cuda_when_unavailable(reset_model_cache: None) -
 
 @pytest.mark.skipif(not _has_semantic_deps(), reason="torch/transformers not installed")
 def test_select_device_prefers_cuda() -> None:
-    from codebase_rag.embedder import (
+    from codebase_rag.unixcoder_runtime import (
         _select_device,  # ty: ignore[possibly-missing-import]
     )
 
-    with patch("codebase_rag.embedder.torch.cuda.is_available", return_value=True):
+    with patch(
+        "codebase_rag.unixcoder_runtime.torch.cuda.is_available", return_value=True
+    ):
         with patch(
-            "codebase_rag.embedder.torch.backends.mps.is_available", return_value=True
+            "codebase_rag.unixcoder_runtime.torch.backends.mps.is_available",
+            return_value=True,
         ):
             assert _select_device() == "cuda"
 
 
 @pytest.mark.skipif(not _has_semantic_deps(), reason="torch/transformers not installed")
 def test_select_device_uses_mps_when_cuda_unavailable() -> None:
-    from codebase_rag.embedder import (
+    from codebase_rag.unixcoder_runtime import (
         _select_device,  # ty: ignore[possibly-missing-import]
     )
 
-    with patch("codebase_rag.embedder.torch.cuda.is_available", return_value=False):
+    with patch(
+        "codebase_rag.unixcoder_runtime.torch.cuda.is_available", return_value=False
+    ):
         with patch(
-            "codebase_rag.embedder.torch.backends.mps.is_available", return_value=True
+            "codebase_rag.unixcoder_runtime.torch.backends.mps.is_available",
+            return_value=True,
         ):
             assert _select_device() == "mps"
 
 
 @pytest.mark.skipif(not _has_semantic_deps(), reason="torch/transformers not installed")
 def test_select_device_falls_back_to_cpu() -> None:
-    from codebase_rag.embedder import (
+    from codebase_rag.unixcoder_runtime import (
         _select_device,  # ty: ignore[possibly-missing-import]
     )
 
-    with patch("codebase_rag.embedder.torch.cuda.is_available", return_value=False):
+    with patch(
+        "codebase_rag.unixcoder_runtime.torch.cuda.is_available", return_value=False
+    ):
         with patch(
-            "codebase_rag.embedder.torch.backends.mps.is_available", return_value=False
+            "codebase_rag.unixcoder_runtime.torch.backends.mps.is_available",
+            return_value=False,
         ):
             assert _select_device() == "cpu"
 
@@ -214,18 +268,22 @@ def test_select_device_falls_back_to_cpu() -> None:
 def test_get_model_moves_to_mps_when_available(reset_model_cache: None) -> None:
     from codebase_rag.embedder import get_model  # ty: ignore[possibly-missing-import]
 
-    with patch("codebase_rag.embedder.UniXcoder") as mock_unixcoder_class:
+    with patch("codebase_rag.unixcoder_runtime.UniXcoder") as mock_unixcoder_class:
         mock_instance = MagicMock()
         mock_instance.eval.return_value = mock_instance
         mock_instance.to.return_value = mock_instance
         mock_unixcoder_class.return_value = mock_instance
 
-        with patch("codebase_rag.embedder.torch.cuda.is_available", return_value=False):
+        with patch(
+            "codebase_rag.unixcoder_runtime.torch.cuda.is_available", return_value=False
+        ):
             with patch(
-                "codebase_rag.embedder.torch.backends.mps.is_available",
+                "codebase_rag.unixcoder_runtime.torch.backends.mps.is_available",
                 return_value=True,
             ):
-                with patch("codebase_rag.embedder.torch.mps.synchronize") as sync:
+                with patch(
+                    "codebase_rag.unixcoder_runtime.torch.mps.synchronize"
+                ) as sync:
                     get_model()
 
     mock_instance.to.assert_called_once_with("mps")
@@ -396,7 +454,7 @@ def test_embed_code_uses_cache(
     cache = get_embedding_cache()
     cache.put("cached_code", [0.42] * 768)
 
-    with patch("codebase_rag.embedder.get_model", return_value=mock_unixcoder):
+    with patch("codebase_rag.unixcoder_runtime.get_model", return_value=mock_unixcoder):
         result = embed_code("cached_code")
 
     assert result == [0.42] * 768
@@ -414,7 +472,7 @@ def test_embed_code_populates_cache(
     mock_embedding = torch.ones(1, 768)
     mock_unixcoder.return_value = (torch.zeros(1, 5, 768), mock_embedding)
 
-    with patch("codebase_rag.embedder.get_model", return_value=mock_unixcoder):
+    with patch("codebase_rag.unixcoder_runtime.get_model", return_value=mock_unixcoder):
         embed_code("new_code")
 
     cache = get_embedding_cache()
@@ -441,7 +499,7 @@ def test_embed_code_batch_returns_correct_count(
     mock_embedding = torch.zeros(3, 768)
     mock_unixcoder.return_value = (torch.zeros(3, 5, 768), mock_embedding)
 
-    with patch("codebase_rag.embedder.get_model", return_value=mock_unixcoder):
+    with patch("codebase_rag.unixcoder_runtime.get_model", return_value=mock_unixcoder):
         results = embed_code_batch(snippets)
 
     assert len(results) == 3
@@ -461,7 +519,7 @@ def test_embed_code_batch_uses_padding(
     mock_embedding = torch.zeros(2, 768)
     mock_unixcoder.return_value = (torch.zeros(2, 5, 768), mock_embedding)
 
-    with patch("codebase_rag.embedder.get_model", return_value=mock_unixcoder):
+    with patch("codebase_rag.unixcoder_runtime.get_model", return_value=mock_unixcoder):
         embed_code_batch(snippets)
 
     mock_unixcoder.tokenize.assert_called_once_with(
@@ -479,7 +537,7 @@ def test_embed_code_batch_cache_hit(
     cache.put("a", [1.0] * 768)
     cache.put("b", [2.0] * 768)
 
-    with patch("codebase_rag.embedder.get_model", return_value=mock_unixcoder):
+    with patch("codebase_rag.unixcoder_runtime.get_model", return_value=mock_unixcoder):
         results = embed_code_batch(["a", "b"])
 
     mock_unixcoder.tokenize.assert_not_called()
@@ -501,7 +559,7 @@ def test_embed_code_batch_partial_cache(
     mock_embedding = torch.full((1, 768), 3.0)
     mock_unixcoder.return_value = (torch.zeros(1, 5, 768), mock_embedding)
 
-    with patch("codebase_rag.embedder.get_model", return_value=mock_unixcoder):
+    with patch("codebase_rag.unixcoder_runtime.get_model", return_value=mock_unixcoder):
         results = embed_code_batch(["a", "b"])
 
     assert results[0] == [1.0] * 768
@@ -521,7 +579,7 @@ def test_embed_code_batch_populates_cache(
     mock_embedding = torch.ones(1, 768)
     mock_unixcoder.return_value = (torch.zeros(1, 5, 768), mock_embedding)
 
-    with patch("codebase_rag.embedder.get_model", return_value=mock_unixcoder):
+    with patch("codebase_rag.unixcoder_runtime.get_model", return_value=mock_unixcoder):
         embed_code_batch(["new_snippet"])
 
     cache = get_embedding_cache()
@@ -549,7 +607,7 @@ def test_embed_code_batch_respects_batch_size(
 
     mock_unixcoder.side_effect = side_effect_forward
 
-    with patch("codebase_rag.embedder.get_model", return_value=mock_unixcoder):
+    with patch("codebase_rag.unixcoder_runtime.get_model", return_value=mock_unixcoder):
         results = embed_code_batch(snippets, batch_size=2)
 
     assert len(results) == 5

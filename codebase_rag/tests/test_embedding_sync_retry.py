@@ -37,7 +37,7 @@ from codebase_rag.constants import VectorStoreBackend
 from codebase_rag.graph_updater import GraphUpdater
 from codebase_rag.parser_loader import load_parsers
 from codebase_rag.sqlite_vectors import extensions_loadable
-from codebase_rag.types_defs import PropertyParams, ResultRow
+from codebase_rag.types_defs import EmbeddingSymbol, PropertyParams, ResultRow
 from codebase_rag.utils.dependencies import (
     has_pymilvus,
     has_qdrant_client,
@@ -891,3 +891,131 @@ def test_milvus_retries_a_row_whose_upsert_failed(
 
     assert retry.skipped_because_in_sync is False
     assert rows() == [(_KEEP, 2)]
+
+
+@pytest.fixture
+def delta_revision(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        vs.settings, "EMBEDDING_PROVIDER", cs.EmbeddingProvider.UNIXCODER
+    )
+    monkeypatch.setenv("CGR_EMBEDDING_REVISION", "a" * 40)
+
+
+@pytest.mark.usefixtures("delta_revision")
+def test_qdrant_delta_catches_up_the_untagged_store_then_keeps_noop_fast(
+    repo: Path, graph: _Graph, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    with monkeypatch.context() as stock:
+        stock.delenv("CGR_EMBEDDING_REVISION")
+        _sync(repo, graph, {1: _KEEP, 2: _DELETE})
+
+    with patch.object(vs, "_upsert_with_retry", wraps=vs._upsert_with_retry) as upsert:
+        catch_up = _sync(repo, graph, {1: _KEEP, 2: _DELETE})
+
+    assert not catch_up.skipped_because_in_sync
+    assert sum(len(call.args[0]) for call in upsert.call_args_list) == 2
+    with patch.object(vs, "get_qdrant_client") as store:
+        noop = _sync(repo, graph, {1: _KEEP, 2: _DELETE})
+    assert noop.skipped_because_in_sync
+    store.assert_not_called()
+
+    monkeypatch.setenv("CGR_EMBEDDING_REVISION", "b" * 40)
+    with patch.object(vs, "_upsert_with_retry", wraps=vs._upsert_with_retry) as upsert:
+        _sync(repo, graph, {1: _KEEP, 2: _DELETE})
+    assert sum(len(call.args[0]) for call in upsert.call_args_list) == 2
+
+
+@pytest.mark.usefixtures("delta_revision")
+def test_qdrant_delta_rebinds_unchanged_vectors_and_replaces_only_edited_vectors(
+    repo: Path, graph: _Graph
+) -> None:
+    _sync(repo, graph, {1: _KEEP, 2: _DELETE})
+
+    with patch.object(vs, "_upsert_with_retry", wraps=vs._upsert_with_retry) as upsert:
+        _sync(
+            repo,
+            graph,
+            {3: _KEEP, 4: _DELETE},
+            source=_SOURCE_V1.replace("return 2", "return 22"),
+        )
+
+    upsert.assert_called_once()
+    assert [
+        point.payload[cs.PAYLOAD_NODE_ID] for point in upsert.call_args.args[0]
+    ] == [4]
+    assert _points() == [(_DELETE, 4), (_KEEP, 3)]
+
+    renamed_file = repo / "renamed.py"
+    (repo / _MODULE).rename(renamed_file)
+    renamed = f"{_PROJECT}.renamed.keep_me"
+    _sync(repo, graph, [_row(5, renamed, renamed_file.name)])
+    assert _points() == [(renamed, 5)]
+
+
+@pytest.mark.usefixtures("delta_revision")
+def test_qdrant_delta_retries_only_the_missing_point_after_interrupt(
+    repo: Path, graph: _Graph, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(vs.settings, "QDRANT_BATCH_SIZE", 1)
+    batches = 0
+
+    def interrupted(snippets: list[str]) -> list[list[float]]:
+        nonlocal batches
+        batches += 1
+        if batches == 2:
+            raise KeyboardInterrupt
+        return _fake_embed_batch(snippets)
+
+    with pytest.raises(ex.EmbeddingsInterrupted):
+        _sync(repo, graph, {1: _KEEP, 2: _DELETE}, embed=interrupted)
+    assert len(_points()) == 1
+    assert not _in_sync(repo, graph)
+
+    with patch.object(vs, "_upsert_with_retry", wraps=vs._upsert_with_retry) as upsert:
+        retry = _sync(repo, graph, {1: _KEEP, 2: _DELETE})
+    upsert.assert_called_once()
+    assert len(upsert.call_args.args[0]) == 1
+    assert _points() == [(_DELETE, 2), (_KEEP, 1)]
+    assert retry.committed
+    assert _in_sync(repo, graph)
+
+
+@pytest.mark.usefixtures("delta_revision")
+def test_qdrant_delta_defers_when_embedding_dependencies_are_missing(
+    repo: Path, graph: _Graph
+) -> None:
+    _sync(repo, graph, {1: _KEEP}, skip_embeddings=True)
+    updater = _updater(repo, graph)
+    with (
+        patch.object(gu, "has_semantic_dependencies", return_value=False),
+        patch.object(vs, "get_qdrant_client") as store,
+    ):
+        updater.run()
+
+    assert updater.skipped_because_in_sync
+    store.assert_not_called()
+    _sync(repo, graph, {1: _KEEP})
+    assert _points() == [(_KEEP, 1)]
+
+
+@pytest.mark.usefixtures("delta_revision")
+def test_qdrant_delta_retries_when_source_moves_during_extraction(
+    repo: Path, graph: _Graph
+) -> None:
+    original = GraphUpdater._embedding_candidate
+
+    def extract_then_edit(
+        updater: GraphUpdater, row: ResultRow
+    ) -> tuple[int, EmbeddingSymbol, str] | None:
+        candidate = original(updater, row)
+        (repo / _MODULE).write_text(_SOURCE_KEEP_EDITED)
+        return candidate
+
+    with patch.object(GraphUpdater, "_embedding_candidate", extract_then_edit):
+        _sync(repo, graph, {1: _KEEP}, source=_SOURCE_KEEP_ONLY)
+    assert _points() == []
+    assert not _in_sync(repo, graph)
+
+    _sync(repo, graph, {2: _KEEP})
+    assert _points() == [(_KEEP, 2)]
+    assert _in_sync(repo, graph)

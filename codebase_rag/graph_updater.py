@@ -36,6 +36,7 @@ from .dispatch_dependents import (
     dispatch_target_prefixes,
     scan_python_classes,
 )
+from .embedding_identity import embedding_namespace, embedding_revision
 from .function_registry import FunctionRegistryTrie
 from .gloss_anchor import ParsedSource, parse_source
 from .gloss_repair import repair_mentions, repair_unanchored
@@ -905,7 +906,7 @@ def _embeddings_marker(state_dir: Path, project_name: str) -> Path:
 
 
 def _embeddings_store_stamp(state_dir: Path, project_name: str) -> Path:
-    """The file naming the vector store backend `project_name`'s points are in.
+    """The stamp identifying the store that holds `project_name`'s points.
 
     A pass that settles the project writes the selected backend there. Once
     the setting changes, as when `sqlite` replaced Qdrant as the default, the
@@ -919,6 +920,39 @@ def _embeddings_store_stamp(state_dir: Path, project_name: str) -> Path:
     return state_dir / cs.EMBEDDINGS_STORE_PROJECT_TEMPLATE.format(digest=digest)
 
 
+# Changing snippet extraction outside the graph parser fingerprint requires
+# a new version so every project reconciles its stored provenance again.
+_QDRANT_EMBEDDING_PROVENANCE_VERSION = 1
+
+
+def _qdrant_delta_model() -> str | None:
+    """The vector space eligible for durable Qdrant provenance."""
+    if (
+        settings.VECTOR_STORE_BACKEND == cs.VectorStoreBackend.QDRANT
+        and settings.EMBEDDING_PROVIDER == cs.EmbeddingProvider.UNIXCODER
+        and embedding_revision()
+    ):
+        return embedding_namespace()
+    return None
+
+
+def _selected_embeddings_store() -> str:
+    """Identify an opted-in store without opening it on a graph no-op."""
+    backend = str(settings.VECTOR_STORE_BACKEND)
+    if (model := _qdrant_delta_model()) is None:
+        return backend
+    identity = json.dumps(
+        [
+            model,
+            settings.QDRANT_URL or os.path.abspath(settings.QDRANT_DB_PATH),
+            settings.QDRANT_COLLECTION_NAME,
+            settings.QDRANT_VECTOR_DIM,
+        ]
+    )
+    digest = hashlib.sha256(identity.encode()).hexdigest()
+    return f"{backend}:delta-v{_QDRANT_EMBEDDING_PROVENANCE_VERSION}:{digest}"
+
+
 def _stamp_names_selected_store(stamp: Path) -> bool:
     try:
         stamped = stamp.read_text(encoding=cs.ENCODING_UTF8).strip()
@@ -926,12 +960,12 @@ def _stamp_names_selected_store(stamp: Path) -> bool:
         stamped = str(cs.EMBEDDINGS_STORE_UNSTAMPED)
     except OSError:
         return False
-    return stamped == str(settings.VECTOR_STORE_BACKEND)
+    return stamped == _selected_embeddings_store()
 
 
 def _save_embeddings_store(stamp: Path) -> None:
     try:
-        stamp.write_text(str(settings.VECTOR_STORE_BACKEND), encoding=cs.ENCODING_UTF8)
+        stamp.write_text(_selected_embeddings_store(), encoding=cs.ENCODING_UTF8)
     except OSError:
         # Best effort, as for the pending marker: without the stamp the next
         # sync runs the pass again, which is slower but loses nothing.
@@ -10756,6 +10790,15 @@ class GraphUpdater:
                 if not _under_any_project(row.get(cs.KEY_QUALIFIED_NAME), nested)
             ]
             current = self._current_symbols(results)
+            if (model := _qdrant_delta_model()) is not None:
+                from .embedding_delta import reconcile_qdrant_deltas
+
+                try:
+                    reconcile_qdrant_deltas(self, results, current, model)
+                finally:
+                    close_qdrant_client()
+                return
+
             stored_ids: set[int] = set()
 
             if not results:
